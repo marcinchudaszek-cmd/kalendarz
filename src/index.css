@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/* Tryb ciemny sterujemy klasą na <html>, żeby dało się go przełączyć ręcznie. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Smooth modal animation */
+@keyframes animate-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-in {
+  animation: animate-in 0.2s ease-out;
+}
+
+/* Prevent text selection during drag */
+.select-none {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Ensure calendar grid fills space */
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #ffffff;
+  color-scheme: light;
+}
+
+.dark body {
+  background: #111827;
+  color-scheme: dark;
+}
+
+/* Border left width utility */
+.border-l-3 {
+  border-left-width: 3px;
+}
+
+/*
+ * Wysuwany panel boczny. Trzymamy to we własnych klasach zamiast dynamicznie
+ * sklejanych utility Tailwinda — te potrafiły nie trafić do wygenerowanego CSS
+ * i panel zostawał poza ekranem mimo poprawnego stanu.
+ */
+/*
+ * Panel jest pozycjonowany względem obszaru treści, nie okna. Przy `fixed`
+ * wysokość 100% liczyła się od okna, więc panel wystawał pod ekran o wysokość
+ * nagłówka i nie dało się dosięgnąć jego dolnej części.
+ */
+.sidebar-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+  transform: translateX(-100%);
+  transition: transform 200ms ease;
+}
+
+.sidebar-panel.is-open {
+  transform: translateX(0);
+}
+
+/* Na szerokim ekranie panel jest stałym elementem układu, zawsze widocznym. */
+@media (min-width: 1024px) {
+  .sidebar-panel {
+    position: relative;
+    inset: auto;
+    z-index: 0;
+    transform: none;
+  }
+}
+
+/*
+ * Powłoka aplikacji. W przeglądarce to zwykła pełna wysokość, a w aplikacji
+ * Androida dochodzą marginesy na pasek stanu i pasek nawigacji — bez nich
+ * nagłówek chowa się pod zegarkiem systemowym.
+ */
+.app-shell {
+  height: 100dvh;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/*
+ * Druk: zdejmujemy panele sterowania i ograniczenia wysokości, żeby treść
+ * mogła się rozlać na kolejne strony. Najlepiej wypadają widoki miesiąca i agendy —
+ * siatka godzin jest wysoka i i tak zostanie przycięta do widocznego zakresu.
+ */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+  }
+
+  .dark body {
+    background: #ffffff !important;
+  }
+
+  /* Do druku zawsze jasny motyw — ciemne tła zżerają toner. */
+  .dark {
+    color-scheme: light;
+  }
+
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  .h-screen {
+    height: auto !important;
+  }
+
+  .overflow-hidden,
+  .overflow-y-auto,
+  .overflow-x-hidden {
+    overflow: visible !important;
+  }
+
+  /* Kolory kategorii niosą znaczenie, więc mają zostać także na papierze. */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

@@ -1,0 +1,31 @@
+# zależności i buildy
+node_modules
+dist
+dist-cap
+
+# ===== KLUCZ PODPISUJĄCY — NIGDY DO REPO =====
+# Kto ma ten plik i hasła, może podpisywać aktualizacje aplikacji tak, jakby
+# był jej autorem. Utrata klucza = brak możliwości wydania aktualizacji
+# opublikowanej aplikacji. Oba pliki istnieją wyłącznie na dysku autora.
+android/keystore.properties
+android/release.keystore
+# kopia hasel zapisana pod inna nazwa (ze spacja!) — wzorzec musi ja objac
+android/keystore.properties*
+keystore.properties*
+# ...ale wzor z placeholderami ma zostac w repo
+!android/keystore.properties.przyklad
+*.keystore
+*.jks
+
+# artefakty builda Androida
+android/app/build
+android/build
+android/.gradle
+android/local.properties
+android/app/src/main/assets/public
+android/capacitor-cordova-android-plugins
+release/*.apk
+
+# system
+.DS_Store
+*.local
