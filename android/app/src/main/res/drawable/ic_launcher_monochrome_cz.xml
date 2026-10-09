@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Wygenerowane skryptem ikony dni tygodnia — nie edytuj ręcznie. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:pathData="M38.0,40.0H70.0A6.0,6.0 0,0 1,76.0,46.0V69.0A6.0,6.0 0,0 1,70.0,75.0H38.0A6.0,6.0 0,0 1,32.0,69.0V46.0A6.0,6.0 0,0 1,38.0,40.0Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="3.4" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" />
+    <path android:pathData="M44.0,34.5V43.5M64.0,34.5V43.5" android:strokeColor="#FFFFFFFF" android:strokeWidth="3.4" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" />
+    <path android:pathData="M32.0,49.5H76.0" android:strokeColor="#FFFFFFFF" android:strokeWidth="3.4" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" />
+    <path android:pathData="M47.76 68.19Q48.59 68.19 49.19 67.96Q49.79 67.73 50.23 67.35Q50.67 66.97 50.97 66.49Q51.26 66.02 51.45 65.53L54 66.49Q53.69 67.25 53.2 67.97Q52.7 68.7 51.96 69.26Q51.21 69.81 50.18 70.16Q49.15 70.5 47.76 70.5Q45.94 70.5 44.61 69.96Q43.28 69.42 42.41 68.45Q41.54 67.48 41.12 66.15Q40.7 64.82 40.7 63.24Q40.7 61.6 41.12 60.27Q41.54 58.95 42.4 58.02Q43.25 57.09 44.56 56.59Q45.86 56.09 47.63 56.09Q49 56.09 50.03 56.38Q51.06 56.67 51.81 57.19Q52.56 57.71 53.05 58.42Q53.55 59.13 53.82 59.99L51.24 60.69Q51.1 60.24 50.81 59.83Q50.52 59.42 50.08 59.1Q49.64 58.78 49.04 58.59Q48.45 58.4 47.69 58.4Q46.63 58.4 45.86 58.74Q45.1 59.08 44.61 59.72Q44.12 60.35 43.88 61.24Q43.65 62.13 43.65 63.24Q43.65 64.33 43.88 65.24Q44.12 66.15 44.61 66.8Q45.11 67.46 45.89 67.83Q46.67 68.19 47.76 68.19ZM67.3 70.3H56.06V68.22L63.64 58.6H56.82V56.3H66.89V58.34L59.32 68H67.3Z" android:fillColor="#FFFFFFFF" />
+</vector>

@@ -40,6 +40,7 @@ import { MonthView } from './components/MonthView';
 import { WeekView } from './components/WeekView';
 import { DayView } from './components/DayView';
 import { AgendaView } from './components/AgendaView';
+import { YearView } from './components/YearView';
 import { EventModal } from './components/EventModal';
 import { EventPopover } from './components/EventPopover';
 import { EmptyState } from './components/EmptyState';
@@ -84,12 +85,17 @@ function App() {
    */
   const expandedEvents = useMemo(() => {
     const now = new Date();
-    const viewStart = startOfDay(subDays(currentDate, 45));
-    const viewEnd = endOfDay(addDays(currentDate, 45));
+    // Widok roku potrzebuje wystąpień z całego roku, pozostałe — okolicy bieżącej daty.
+    const viewStart =
+      view === 'year' ? new Date(currentDate.getFullYear(), 0, 1) : startOfDay(subDays(currentDate, 45));
+    const viewEnd =
+      view === 'year'
+        ? endOfDay(new Date(currentDate.getFullYear(), 11, 31))
+        : endOfDay(addDays(currentDate, 45));
     const rangeStart = viewStart < subDays(now, 1) ? viewStart : startOfDay(subDays(now, 1));
     const rangeEnd = viewEnd > addDays(now, 60) ? viewEnd : endOfDay(addDays(now, 60));
     return expandEvents(events, rangeStart, rangeEnd);
-  }, [events, currentDate]);
+  }, [events, currentDate, view]);
 
   const eventsRef = useRef(events);
   eventsRef.current = events;
@@ -469,6 +475,21 @@ function App() {
         <main className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900 relative">
           {events.length === 0 && (
             <EmptyState onCreate={handleCreateButton} onLoadSamples={handleLoadSamples} />
+          )}
+          {view === 'year' && (
+            <YearView
+              currentDate={currentDate}
+              events={expandedEvents}
+              visibleCategories={visibleCategories}
+              onOpenDay={(day) => {
+                setCurrentDate(day);
+                setView('day');
+              }}
+              onOpenMonth={(month) => {
+                setCurrentDate(month);
+                setView('month');
+              }}
+            />
           )}
           {view === 'month' && (
             <MonthView

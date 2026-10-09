@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 export interface ShortcutHandlers {
-  onView: (view: 'month' | 'week' | 'day' | 'agenda') => void;
+  onView: (view: 'year' | 'month' | 'week' | 'day' | 'agenda') => void;
   onPrev: () => void;
   onNext: () => void;
   onToday: () => void;
@@ -53,6 +53,9 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers, enabled: boolea
           break;
         default:
           switch (e.key.toLowerCase()) {
+            case 'r':
+              handlers.onView('year');
+              break;
             case 'm':
               handlers.onView('month');
               break;

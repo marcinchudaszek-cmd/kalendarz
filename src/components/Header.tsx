@@ -5,13 +5,14 @@ import { SearchBox } from './SearchBox';
 import { cn } from '../utils/cn';
 
 const VIEW_LABELS: Record<ViewMode, string> = {
+  year: 'Rok',
   month: 'Miesiąc',
   week: 'Tydzień',
   day: 'Dzień',
   agenda: 'Agenda',
 };
 
-const VIEW_ORDER: ViewMode[] = ['month', 'week', 'day', 'agenda'];
+const VIEW_ORDER: ViewMode[] = ['year', 'month', 'week', 'day', 'agenda'];
 
 interface HeaderProps {
   currentDate: Date;
@@ -45,6 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
   const goNext = () => setCurrentDate(shiftByView(currentDate, view, 1));
 
   const titleText = () => {
+    if (view === 'year') return format(currentDate, 'yyyy');
     if (view === 'month') return format(currentDate, 'LLLL yyyy');
     if (view === 'week') {
       const start = startOfWeek(currentDate);
@@ -130,7 +132,7 @@ export const Header: React.FC<HeaderProps> = ({
           focusSignal={searchFocusSignal}
         />
 
-        {/* Na wąskim ekranie cztery przyciski się nie mieszczą. */}
+        {/* Na wąskim ekranie pięć przycisków się nie mieszczą. */}
         <select
           value={view}
           onChange={(e) => setView(e.target.value as ViewMode)}

@@ -76,6 +76,8 @@ export function parseDayInput(value: string): Date {
 /** Przesuwa datę o jeden krok w przód lub w tył, zależnie od widoku. */
 export function shiftByView(date: Date, view: ViewMode, direction: 1 | -1): Date {
   switch (view) {
+    case 'year':
+      return addMonths(date, 12 * direction);
     case 'month':
       return direction === 1 ? addMonths(date, 1) : subMonths(date, 1);
     case 'week':
@@ -90,6 +92,8 @@ export function shiftByView(date: Date, view: ViewMode, direction: 1 | -1): Date
 /** Okres, który obejmuje dany widok — używany przy podsumowaniach. */
 export function getViewRange(date: Date, view: ViewMode): { start: Date; end: Date } {
   switch (view) {
+    case 'year':
+      return { start: new Date(date.getFullYear(), 0, 1), end: endOfDay(new Date(date.getFullYear(), 11, 31)) };
     case 'month': {
       const days = getMonthDays(date);
       return { start: startOfDay(days[0]), end: endOfDay(days[days.length - 1]) };

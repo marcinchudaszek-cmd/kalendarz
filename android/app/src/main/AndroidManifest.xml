@@ -15,14 +15,121 @@
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBarLaunch"
             android:launchMode="singleTask"
-            android:exported="true">
+            android:exported="true" />
 
+        <!--
+            Ikona z dzisiejszym dniem tygodnia: siedem aliasów MainActivity z różnymi ikonami,
+            włączony jest zawsze jeden (IkonaDnia.java). Domyślnie poniedziałek — po pierwszym
+            otwarciu aplikacja przełącza na właściwy dzień.
+        -->
+        <activity-alias
+            android:name=".IkonaPn"
+            android:targetActivity=".MainActivity"
+            android:icon="@mipmap/ic_launcher_pn"
+            android:roundIcon="@mipmap/ic_launcher_pn"
+            android:label="@string/app_name"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity-alias>
 
-        </activity>
+        <activity-alias
+            android:name=".IkonaWt"
+            android:targetActivity=".MainActivity"
+            android:icon="@mipmap/ic_launcher_wt"
+            android:roundIcon="@mipmap/ic_launcher_wt"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IkonaSr"
+            android:targetActivity=".MainActivity"
+            android:icon="@mipmap/ic_launcher_sr"
+            android:roundIcon="@mipmap/ic_launcher_sr"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IkonaCz"
+            android:targetActivity=".MainActivity"
+            android:icon="@mipmap/ic_launcher_cz"
+            android:roundIcon="@mipmap/ic_launcher_cz"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IkonaPt"
+            android:targetActivity=".MainActivity"
+            android:icon="@mipmap/ic_launcher_pt"
+            android:roundIcon="@mipmap/ic_launcher_pt"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IkonaSo"
+            android:targetActivity=".MainActivity"
+            android:icon="@mipmap/ic_launcher_so"
+            android:roundIcon="@mipmap/ic_launcher_so"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IkonaNd"
+            android:targetActivity=".MainActivity"
+            android:icon="@mipmap/ic_launcher_nd"
+            android:roundIcon="@mipmap/ic_launcher_nd"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <receiver
+            android:name=".IkonaDniaReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -38,4 +145,6 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Po restarcie telefonu trzeba ponownie zaplanować zmianę ikony o północy. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 </manifest>

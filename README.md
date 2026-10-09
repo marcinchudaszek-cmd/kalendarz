@@ -10,7 +10,8 @@ APK: **https://beagleapps.pl/apk/kalendarz.apk**
 
 | | |
 |---|---|
-| **Cztery widoki** | dzień, tydzień, miesiąc i agenda najbliższych 30 dni |
+| **Pięć widoków** | rok (z mapą zajętości), miesiąc, tydzień, dzień i agenda najbliższych 30 dni |
+| **Ikona dnia tygodnia** | ikona w launcherze pokazuje dzisiejszy dzień (PN–ND) i dopasowuje się do motywu ikon Androida 13+ |
 | **Przypomnienia** | od 5 minut do doby przed wydarzeniem, pięć dźwięków, drzemka o 5 minut |
 | **Wydarzenia cykliczne** | dziennie / tygodniowo / miesięcznie / rocznie, z odstępem i datą końca |
 | **Własne kategorie** | nazwy i kolory z palety dwunastu barw, ukrywanie jednym kliknięciem |
@@ -67,3 +68,10 @@ w Sklepie Play.
 
 W `sklep-play/` leżą gotowe teksty (`opis-sklepowy.md`), polityka prywatności,
 deklaracja bezpieczeństwa danych, ikona 512, grafika promocyjna i zrzuty ekranu.
+
+## Ikona z dniem tygodnia (Android)
+
+W manifeście jest siedem aliasów `MainActivity` (`.IkonaPn` … `.IkonaNd`), każdy z własną ikoną
+adaptacyjną z warstwą monochromatyczną. `IkonaDnia.java` włącza alias bieżącego dnia przy każdym
+otwarciu aplikacji i alarmem tuż po północy (`IkonaDniaReceiver` — też po restarcie, aktualizacji
+i zmianie daty). Wektory ikon generuje `narzedzia/ikony-dni.py` — nie edytuj ich ręcznie.

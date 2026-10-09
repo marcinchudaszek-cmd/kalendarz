@@ -5,6 +5,7 @@ import { format } from '../calendarUtils';
 import { cn } from '../utils/cn';
 
 const SHORTCUTS: [string, string][] = [
+  ['R', 'Rok'],
   ['M', 'Miesiąc'],
   ['T', 'Tydzień'],
   ['D', 'Dzień'],

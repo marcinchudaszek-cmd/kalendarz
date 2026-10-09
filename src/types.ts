@@ -1,4 +1,4 @@
-export type ViewMode = 'month' | 'week' | 'day' | 'agenda';
+export type ViewMode = 'year' | 'month' | 'week' | 'day' | 'agenda';
 
 export type RecurrenceFreq = 'daily' | 'weekly' | 'monthly' | 'yearly';
 
