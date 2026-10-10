@@ -120,6 +120,24 @@
             </intent-filter>
         </activity-alias>
 
+        <!-- Widżet z najbliższymi wydarzeniami. Dane przysyła aplikacja (WidzetPlugin). -->
+        <receiver
+            android:name=".WidzetKalendarza"
+            android:label="@string/widzet_nazwa"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widzet_kalendarza_info" />
+        </receiver>
+
+        <service
+            android:name=".WidzetSerwis"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
+
         <receiver
             android:name=".IkonaDniaReceiver"
             android:exported="false">

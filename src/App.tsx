@@ -19,6 +19,7 @@ import { playReminderSound, unlockAudioOnFirstGesture } from './utils/sound';
 import { showSystemNotification } from './utils/notifications';
 import {
   format,
+  parseDayInput,
   startOfDay,
   endOfDay,
   addDays,
@@ -33,6 +34,7 @@ import { expandEvents } from './recurrenceUtils';
 import { cn } from './utils/cn';
 import { reminderFireTime } from './reminderUtils';
 import { scheduleReminderNotifications } from './utils/pwa';
+import { updateWidget, onWidgetAction } from './utils/widget';
 
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -223,6 +225,31 @@ function App() {
     setModalInitial(undefined);
     setModalOpen(true);
   }, []);
+
+  // Widżet na ekranie głównym dostaje aktualne wydarzenia po każdej zmianie.
+  useEffect(() => {
+    void updateWidget(events, categories);
+  }, [events, categories]);
+
+  // Kliknięcia w widżecie: „+” otwiera nowe wydarzenie, wiersz — jego dzień.
+  useEffect(
+    () =>
+      onWidgetAction(({ akcja, dzien }) => {
+        setPopoverEvent(null);
+        if (akcja === 'nowe') {
+          setCurrentDate(new Date());
+          handleCreateButton();
+        } else if (akcja === 'dzien' && dzien) {
+          setModalOpen(false);
+          setCurrentDate(parseDayInput(dzien));
+          setView('day');
+        } else {
+          setModalOpen(false);
+          setCurrentDate(new Date());
+        }
+      }),
+    [handleCreateButton]
+  );
 
   /** Wystąpienie serii wskazuje na wydarzenie źródłowe — to jego edytujemy. */
   const resolveMaster = useCallback(

@@ -11,6 +11,7 @@ APK: **https://beagleapps.pl/apk/kalendarz.apk**
 | | |
 |---|---|
 | **Pięć widoków** | rok (z mapą zajętości), miesiąc, tydzień, dzień i agenda najbliższych 30 dni |
+| **Widżet na ekran główny** | dzisiejsza data, wydarzenia z najbliższego tygodnia, „+” dodaje wydarzenie, wiersz otwiera jego dzień |
 | **Ikona dnia tygodnia** | ikona w launcherze pokazuje dzisiejszy dzień (PN–ND) i dopasowuje się do motywu ikon Androida 13+ |
 | **Przypomnienia** | od 5 minut do doby przed wydarzeniem, pięć dźwięków, drzemka o 5 minut |
 | **Wydarzenia cykliczne** | dziennie / tygodniowo / miesięcznie / rocznie, z odstępem i datą końca |
@@ -75,3 +76,10 @@ W manifeście jest siedem aliasów `MainActivity` (`.IkonaPn` … `.IkonaNd`), k
 adaptacyjną z warstwą monochromatyczną. `IkonaDnia.java` włącza alias bieżącego dnia przy każdym
 otwarciu aplikacji i alarmem tuż po północy (`IkonaDniaReceiver` — też po restarcie, aktualizacji
 i zmianie daty). Wektory ikon generuje `narzedzia/ikony-dni.py` — nie edytuj ich ręcznie.
+
+## Widżet (Android)
+
+`WidzetKalendarza` (AppWidgetProvider) + `WidzetSerwis` (lista). Widżet nie widzi danych WebView —
+aplikacja po każdej zmianie wysyła mu rozpisane wydarzenia na 14 dni (`src/utils/widget.ts` →
+`WidzetPlugin.zapiszWydarzenia`, SharedPreferences `widzet_kalendarza`). Kliknięcia wracają do aplikacji
+zdarzeniem `akcja` (`dzis` / `nowe` / `dzien`). Odświeżanie: co 30 min i o północy (`IkonaDniaReceiver`).

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kolory i wymiary widżetu kalendarza (wersja jasna; ciemna w values-night). -->
+<resources>
+    <color name="widzet_tlo">#FFFFFFFF</color>
+    <color name="widzet_tekst">#FF1F2937</color>
+    <color name="widzet_tekst_drugi">#FF6B7280</color>
+    <color name="widzet_akcent">#FF2563EB</color>
+    <color name="widzet_akcent_tlo">#FFDBEAFE</color>
+    <dimen name="widzet_promien">20dp</dimen>
+    <string name="widzet_nazwa">Kalendarz — najbliższe wydarzenia</string>
+    <string name="widzet_opis">Dzisiejsza data i najbliższe wydarzenia</string>
+    <string name="widzet_pusto">Brak wydarzeń w najbliższych dniach.\nStuknij, aby otworzyć kalendarz.</string>
+    <string name="widzet_dodaj">Dodaj wydarzenie</string>
+</resources>
