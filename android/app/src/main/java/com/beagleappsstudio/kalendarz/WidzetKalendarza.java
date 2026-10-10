@@ -1,4 +1,4 @@
-package com.marcin.kalendarz;
+package com.beagleappsstudio.kalendarz;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -69,7 +69,7 @@ public class WidzetKalendarza extends AppWidgetProvider {
 
         // Szablon dla wierszy listy — każdy wiersz dokłada swój dzień (fillInIntent).
         Intent szablon = new Intent(context, MainActivity.class)
-            .setAction("com.marcin.kalendarz.WIDZET_DZIEN")
+            .setAction("com.beagleappsstudio.kalendarz.WIDZET_DZIEN")
             .putExtra(EXTRA_AKCJA, "dzien")
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         widok.setPendingIntentTemplate(
@@ -87,7 +87,7 @@ public class WidzetKalendarza extends AppWidgetProvider {
     private static PendingIntent otworz(Context context, String akcja, int requestCode) {
         Intent intent = new Intent(context, MainActivity.class)
             // Różne akcje — inaczej system uzna intencje za identyczne i podmieni dodatki.
-            .setAction("com.marcin.kalendarz.WIDZET_" + akcja)
+            .setAction("com.beagleappsstudio.kalendarz.WIDZET_" + akcja)
             .putExtra(EXTRA_AKCJA, akcja)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(

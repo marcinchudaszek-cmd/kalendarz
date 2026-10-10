@@ -1,4 +1,4 @@
-package com.marcin.kalendarz;
+package com.beagleappsstudio.kalendarz;
 
 import android.content.Intent;
 import android.os.Bundle;

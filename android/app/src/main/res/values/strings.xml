@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Kalendarz</string>
     <string name="title_activity_main">Kalendarz</string>
-    <string name="package_name">com.marcin.kalendarz</string>
-    <string name="custom_url_scheme">com.marcin.kalendarz</string>
+    <string name="package_name">com.beagleappsstudio.kalendarz</string>
+    <string name="custom_url_scheme">com.beagleappsstudio.kalendarz</string>
 </resources>

@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.marcin.kalendarz',
+  appId: 'com.beagleappsstudio.kalendarz',
   appName: 'Kalendarz',
   webDir: 'dist',
   // Tło WebView przed wczytaniem strony (jasny motyw domyślny)

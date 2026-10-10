@@ -44,8 +44,9 @@ dawałyby 404, przez co instalacja workera w ogóle by się nie kończyła.
 
 ## Android
 
-Capacitor, `applicationId` **com.marcin.kalendarz** — identyfikator sprzed konwencji
-`com.beagleappsstudio.*`; po publikacji nie da się go zmienić, więc zostaje.
+Capacitor, `applicationId` **com.beagleappsstudio.kalendarz** (od 1.2.0; wcześniej APK ze strony
+miały `com.marcin.kalendarz` — to inna aplikacja dla systemu, dane przenosi się eksportem .ics).
+Po pierwszej wysyłce do Google Play identyfikatora nie da się już zmienić.
 
 W trybie androidowym Service Worker jest wyłączany przez `VITE_ANDROID=true`
 (`.env.android`): w APK wszystkie pliki są lokalne, a worker tylko cachowałby

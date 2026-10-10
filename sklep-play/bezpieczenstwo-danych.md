@@ -31,9 +31,15 @@ kategorie danych (lokalizacja, kontakty, pliki itd.).
 | Treści dla dzieci | Aplikacja nie jest kierowana do dzieci |
 | Kategoria treści | Ocena wiekowa: dla wszystkich (kwestionariusz IARC bez treści wrażliwych) |
 | Uprawnienia wrażliwe | Brak (bez lokalizacji, kontaktów, SMS-ów, aparatu) |
+| Dostęp do aplikacji | Wszystkie funkcje dostępne bez logowania i bez ograniczeń |
 | Polityka prywatności | Wymagany publiczny adres URL — patrz niżej |
 
-## Publikacja polityki prywatności
+## Adres polityki prywatności (opublikowana 10.10.2026)
+
+**https://marcinchudaszek-cmd.github.io/kalendarz-privacy/** — repo `marcinchudaszek-cmd/kalendarz-privacy`,
+źródło: `sklep-play/polityka-prywatnosci.html` (po zmianie skopiuj jako `index.html` do tego repo).
+
+## Publikacja polityki prywatności (jak to zrobiono)
 
 Plik `polityka-prywatnosci.html` musi być dostępny pod publicznym adresem.
 Najprostsze darmowe opcje:

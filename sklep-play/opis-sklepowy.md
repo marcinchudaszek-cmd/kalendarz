@@ -33,11 +33,20 @@ Prosty kalendarz po polsku z przypomnieniami. Bez konta, dane zostają u Ciebie.
 ```
 Kalendarz, który po prostu przypomina o Twoich planach — bez zakładania konta, bez reklam i bez wysyłania czegokolwiek do internetu.
 
-CZTERY WIDOKI
+PIĘĆ WIDOKÓW
+• Rok — wszystkie miesiące na jednym ekranie z mapą zajętości dni
 • Dzień — szczegółowy plan godzina po godzinie
 • Tydzień — cały tydzień na jednym ekranie
 • Miesiąc — szybki przegląd, co się dzieje
 • Agenda — lista najbliższych 30 dni
+
+WIDŻET NA EKRAN GŁÓWNY
+Dzisiejsza data i wydarzenia z najbliższego tygodnia — bez otwierania aplikacji.
+Stuknij wydarzenie, żeby otworzyć jego dzień, albo „+”, żeby od razu dodać nowe.
+
+IKONA Z DNIEM TYGODNIA
+Ikona aplikacji pokazuje dzisiejszy dzień (PN, WT, ŚR…) i dopasowuje się
+do motywu ikon w Androidzie 13 i nowszym.
 
 PRZYPOMNIENIA, KTÓRE SŁYCHAĆ
 Ustaw przypomnienie na 5, 10, 15, 30 minut, godzinę, dwie albo dzień przed wydarzeniem.

@@ -1,4 +1,4 @@
-package com.marcin.kalendarz;
+package com.beagleappsstudio.kalendarz;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
