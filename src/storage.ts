@@ -7,12 +7,14 @@ import {
   DEFAULT_REMINDER_SETTINGS,
   SOUND_IDS,
 } from './types';
+import { DEFAULT_HOLIDAY_SETTINGS, GERMAN_STATES, HolidaySettings } from './holidays';
 
 const EVENTS_KEY = 'kalendarz.wydarzenia';
 const SETTINGS_KEY = 'kalendarz.przypomnienia';
 const FIRED_KEY = 'kalendarz.pokazanePrzypomnienia';
 const THEME_KEY = 'kalendarz.motyw';
 const CATEGORIES_KEY = 'kalendarz.kategorie';
+const HOLIDAYS_KEY = 'kalendarz.swieta';
 
 interface StoredEvent extends Omit<CalendarEvent, 'start' | 'end' | 'recurrence'> {
   start: string;
@@ -100,6 +102,20 @@ export function loadCategories(): StoredCategory[] | null {
 
 export function saveCategories(categories: StoredCategory[]): void {
   write(CATEGORIES_KEY, categories);
+}
+
+export function loadHolidaySettings(): HolidaySettings {
+  const stored = read<Partial<HolidaySettings>>(HOLIDAYS_KEY) ?? {};
+  const state = GERMAN_STATES.some((s) => s.value === stored.deState) ? stored.deState! : null;
+  return {
+    pl: typeof stored.pl === 'boolean' ? stored.pl : DEFAULT_HOLIDAY_SETTINGS.pl,
+    de: typeof stored.de === 'boolean' ? stored.de : DEFAULT_HOLIDAY_SETTINGS.de,
+    deState: state,
+  };
+}
+
+export function saveHolidaySettings(settings: HolidaySettings): void {
+  write(HOLIDAYS_KEY, settings);
 }
 
 export function loadTheme(): ThemeMode {

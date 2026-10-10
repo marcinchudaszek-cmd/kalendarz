@@ -11,6 +11,7 @@ APK: **https://beagleapps.pl/apk/kalendarz.apk**
 | | |
 |---|---|
 | **Pięć widoków** | rok (z mapą zajętości), miesiąc, tydzień, dzień i agenda najbliższych 30 dni |
+| **Święta i dni wolne** | polskie i niemieckie (z regionalnymi wg kraju związkowego), liczone w locie w `src/holidays.ts` |
 | **Widżet na ekran główny** | dzisiejsza data, wydarzenia z najbliższego tygodnia, „+” dodaje wydarzenie, wiersz otwiera jego dzień |
 | **Ikona dnia tygodnia** | ikona w launcherze pokazuje dzisiejszy dzień (PN–ND) i dopasowuje się do motywu ikon Androida 13+ |
 | **Przypomnienia** | od 5 minut do doby przed wydarzeniem, pięć dźwięków, drzemka o 5 minut |

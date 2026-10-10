@@ -13,8 +13,9 @@ interface EventPopoverProps {
   category: Category;
   position: { x: number; y: number };
   onClose: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
+  /** Brak = wydarzenie tylko do odczytu (święto). */
+  onEdit?: () => void;
+  onDelete?: () => void;
   /** Dostępne tylko dla wydarzeń z serii. */
   onDeleteSeries?: () => void;
 }
@@ -152,6 +153,7 @@ export const EventPopover: React.FC<EventPopoverProps> = ({
         )}
 
         {/* Actions */}
+        {onEdit && onDelete && (
         <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 space-y-2">
           <div className="flex gap-2">
             <button
@@ -176,6 +178,7 @@ export const EventPopover: React.FC<EventPopoverProps> = ({
             </button>
           )}
         </div>
+        )}
       </div>
     </div>
   );

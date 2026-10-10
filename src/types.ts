@@ -45,6 +45,8 @@ export interface CalendarEvent {
   seriesId?: string;
   /** Dzień wystąpienia (yyyy-MM-dd) — klucz wyjątków i przypomnień. */
   occurrenceDate?: string;
+  /** Święto wyliczane w locie — tylko do odczytu, nigdy nie trafia do zapisu. */
+  holiday?: boolean;
 }
 
 export const RECURRENCE_OPTIONS: { value: RecurrenceFreq | null; label: string }[] = [

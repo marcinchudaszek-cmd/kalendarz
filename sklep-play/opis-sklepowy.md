@@ -40,6 +40,10 @@ PIĘĆ WIDOKÓW
 • Miesiąc — szybki przegląd, co się dzieje
 • Agenda — lista najbliższych 30 dni
 
+ŚWIĘTA I DNI WOLNE
+Polskie dni ustawowo wolne (także ruchome: Wielkanoc, Zielone Świątki, Boże Ciało)
+oraz niemieckie święta — ogólnokrajowe i regionalne dla wybranego kraju związkowego.
+
 WIDŻET NA EKRAN GŁÓWNY
 Dzisiejsza data i wydarzenia z najbliższego tygodnia — bez otwierania aplikacji.
 Stuknij wydarzenie, żeby otworzyć jego dzień, albo „+”, żeby od razu dodać nowe.

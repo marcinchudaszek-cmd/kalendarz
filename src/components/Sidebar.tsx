@@ -4,6 +4,8 @@ import { MiniCalendar } from './MiniCalendar';
 import { ReminderSettingsPanel } from './ReminderSettingsPanel';
 import { CalendarToolsPanel } from './CalendarToolsPanel';
 import { CategorySummary } from './CategorySummary';
+import { HolidaySettingsPanel } from './HolidaySettingsPanel';
+import { HolidaySettings } from '../holidays';
 import { cn } from '../utils/cn';
 
 interface SidebarProps {
@@ -27,6 +29,8 @@ interface SidebarProps {
   summaryEvents: CalendarEvent[];
   summaryRange: { start: Date; end: Date };
   summaryLabel: string;
+  holidaySettings: HolidaySettings;
+  onHolidaySettingsChange: (settings: HolidaySettings) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -48,6 +52,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   summaryEvents,
   summaryRange,
   summaryLabel,
+  holidaySettings,
+  onHolidaySettingsChange,
 }) => {
   return (
     <aside className="w-60 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0 flex flex-col overflow-y-auto">
@@ -136,6 +142,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         rangeEnd={summaryRange.end}
         rangeLabel={summaryLabel}
       />
+
+      <HolidaySettingsPanel settings={holidaySettings} onChange={onHolidaySettingsChange} />
 
       <ReminderSettingsPanel settings={reminderSettings} onChange={onReminderSettingsChange} />
 

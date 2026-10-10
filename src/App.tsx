@@ -13,7 +13,10 @@ import {
   saveSettings,
   loadCategories,
   saveCategories,
+  loadHolidaySettings,
+  saveHolidaySettings,
 } from './storage';
+import { holidayEvents, HolidaySettings, HOLIDAY_CATEGORY, HOLIDAY_CATEGORY_ID } from './holidays';
 import { useReminders } from './hooks/useReminders';
 import { playReminderSound, unlockAudioOnFirstGesture } from './utils/sound';
 import { showSystemNotification } from './utils/notifications';
@@ -59,9 +62,11 @@ function App() {
   const [categories, setCategories] = useState<Category[]>(() =>
     hydrateCategories(loadCategories() ?? DEFAULT_CATEGORIES)
   );
+  // Święta mają własną kategorię tylko do wyświetlania — włącza się je w ustawieniach świąt.
   const [visibleCategories, setVisibleCategories] = useState<Set<string>>(
-    () => new Set(categories.map((c) => c.id))
+    () => new Set([...categories.map((c) => c.id), HOLIDAY_CATEGORY_ID])
   );
+  const [holidaySettings, setHolidaySettings] = useState<HolidaySettings>(() => loadHolidaySettings());
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false);
   const [reminderSettings, setReminderSettings] = useState<ReminderSettings>(() => loadSettings());
   const [theme, setTheme] = useTheme();
@@ -99,6 +104,17 @@ function App() {
     return expandEvents(events, rangeStart, rangeEnd);
   }, [events, currentDate, view]);
 
+  /** Święta z lat wokół oglądanej daty i bieżącego roku (widżet, przełom roku). */
+  const holidays = useMemo(() => {
+    const y = currentDate.getFullYear();
+    const now = new Date().getFullYear();
+    return holidayEvents([y - 1, y, y + 1, now, now + 1], holidaySettings);
+  }, [currentDate, holidaySettings]);
+
+  /** To, co rysują widoki: wydarzenia użytkownika i święta. */
+  const displayEvents = useMemo(() => [...holidays, ...expandedEvents], [holidays, expandedEvents]);
+  const displayCategories = useMemo(() => [...categories, HOLIDAY_CATEGORY], [categories]);
+
   const eventsRef = useRef(events);
   eventsRef.current = events;
 
@@ -131,6 +147,7 @@ function App() {
     });
   }, [categories]);
   useEffect(() => saveSettings(reminderSettings), [reminderSettings]);
+  useEffect(() => saveHolidaySettings(holidaySettings), [holidaySettings]);
   useEffect(() => unlockAudioOnFirstGesture(), []);
 
   // Dzwonek i powiadomienia czytają ustawienia w chwili zadziałania, nie z domknięcia sprzed godziny.
@@ -228,8 +245,8 @@ function App() {
 
   // Widżet na ekranie głównym dostaje aktualne wydarzenia po każdej zmianie.
   useEffect(() => {
-    void updateWidget(events, categories);
-  }, [events, categories]);
+    void updateWidget([...events, ...holidays], displayCategories);
+  }, [events, holidays, displayCategories]);
 
   // Kliknięcia w widżecie: „+” otwiera nowe wydarzenie, wiersz — jego dzień.
   useEffect(
@@ -295,6 +312,8 @@ function App() {
    */
   const handleEventChange = useCallback(
     (event: CalendarEvent, start: Date, end: Date) => {
+      // Święta są wyliczane — nie da się ich przesunąć.
+      if (event.holiday) return;
       const masterId = event.seriesId ?? event.id;
       const deltaStart = start.getTime() - event.start.getTime();
       const deltaEnd = end.getTime() - event.end.getTime();
@@ -427,8 +446,8 @@ function App() {
   useKeyboardShortcuts(shortcutHandlers, !modalOpen);
 
   const popoverCategory = useMemo(
-    () => (popoverEvent ? categories.find((c) => c.id === popoverEvent.categoryId) : null),
-    [popoverEvent, categories]
+    () => (popoverEvent ? displayCategories.find((c) => c.id === popoverEvent.categoryId) : null),
+    [popoverEvent, displayCategories]
   );
 
   return (
@@ -487,6 +506,8 @@ function App() {
             summaryEvents={expandedEvents.filter((e) => visibleCategories.has(e.categoryId))}
             summaryRange={summaryRange}
             summaryLabel={summaryLabel}
+            holidaySettings={holidaySettings}
+            onHolidaySettingsChange={setHolidaySettings}
           />
         </div>
 
@@ -507,6 +528,7 @@ function App() {
             <YearView
               currentDate={currentDate}
               events={expandedEvents}
+              holidays={holidays}
               visibleCategories={visibleCategories}
               onOpenDay={(day) => {
                 setCurrentDate(day);
@@ -521,8 +543,8 @@ function App() {
           {view === 'month' && (
             <MonthView
               currentDate={currentDate}
-              events={expandedEvents}
-              categories={categories}
+              events={displayEvents}
+              categories={displayCategories}
               visibleCategories={visibleCategories}
               onEventClick={handleEventClick}
               onDayClick={handleDayClick}
@@ -533,8 +555,8 @@ function App() {
           {view === 'week' && (
             <WeekView
               currentDate={currentDate}
-              events={expandedEvents}
-              categories={categories}
+              events={displayEvents}
+              categories={displayCategories}
               visibleCategories={visibleCategories}
               onEventClick={handleEventClick}
               onCreateEvent={handleCreateFromDrag}
@@ -544,8 +566,8 @@ function App() {
           {view === 'day' && (
             <DayView
               currentDate={currentDate}
-              events={expandedEvents}
-              categories={categories}
+              events={displayEvents}
+              categories={displayCategories}
               visibleCategories={visibleCategories}
               onEventClick={handleEventClick}
               onCreateEvent={handleCreateFromDrag}
@@ -555,8 +577,8 @@ function App() {
           {view === 'agenda' && (
             <AgendaView
               currentDate={currentDate}
-              events={expandedEvents}
-              categories={categories}
+              events={displayEvents}
+              categories={displayCategories}
               visibleCategories={visibleCategories}
               onEventClick={handleEventClick}
             />
@@ -586,8 +608,8 @@ function App() {
           category={popoverCategory}
           position={popoverPos}
           onClose={() => setPopoverEvent(null)}
-          onEdit={handleEditFromPopover}
-          onDelete={() => deleteOccurrence(popoverEvent)}
+          onEdit={popoverEvent.holiday ? undefined : handleEditFromPopover}
+          onDelete={popoverEvent.holiday ? undefined : () => deleteOccurrence(popoverEvent)}
           onDeleteSeries={popoverEvent.seriesId ? () => deleteSeries(popoverEvent) : undefined}
         />
       )}

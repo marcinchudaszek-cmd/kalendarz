@@ -13,6 +13,8 @@ import { cn } from '../utils/cn';
 interface YearViewProps {
   currentDate: Date;
   events: CalendarEvent[];
+  /** Dni wolne — zaznaczane czerwonym numerem, nie liczą się do zajętości. */
+  holidays: CalendarEvent[];
   visibleCategories: Set<string>;
   /** Kliknięcie dnia otwiera go w widoku dnia. */
   onOpenDay: (day: Date) => void;
@@ -38,6 +40,7 @@ function busyClass(count: number): string {
 export const YearView: React.FC<YearViewProps> = ({
   currentDate,
   events,
+  holidays,
   visibleCategories,
   onOpenDay,
   onOpenMonth,
@@ -71,6 +74,16 @@ export const YearView: React.FC<YearViewProps> = ({
       scrollRef.current.scrollTop = target.offsetTop - scrollRef.current.offsetTop - 8;
     }
   }, [year]);
+
+  const holidayNames = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const h of holidays) {
+      if (h.start.getFullYear() !== year) continue;
+      const key = dayKey(h.start);
+      map.set(key, [...(map.get(key) ?? []), h.title]);
+    }
+    return map;
+  }, [holidays, year]);
 
   return (
     <div ref={scrollRef} className="flex-1 overflow-y-auto">
@@ -112,20 +125,23 @@ export const YearView: React.FC<YearViewProps> = ({
 
                   const count = counts.get(dayKey(day)) ?? 0;
                   const today = isToday(day);
+                  const holiday = holidayNames.get(dayKey(day));
+                  const label = [format(day, 'd MMMM'), ...(holiday ?? []), count ? `wydarzenia: ${count}` : '']
+                    .filter(Boolean)
+                    .join(' · ');
 
                   return (
                     <button
                       key={day.getTime()}
                       onClick={() => onOpenDay(day)}
-                      title={
-                        count === 0
-                          ? format(day, 'd MMMM')
-                          : `${format(day, 'd MMMM')} · wydarzenia: ${count}`
-                      }
-                      aria-label={`${format(day, 'EEEE, d MMMM yyyy')}${count ? `, wydarzenia: ${count}` : ''}`}
+                      title={label}
+                      aria-label={`${format(day, 'EEEE, d MMMM yyyy')}${holiday ? `, ${holiday.join(', ')}` : ''}${
+                        count ? `, wydarzenia: ${count}` : ''
+                      }`}
                       className={cn(
                         'aspect-square w-full max-w-9 mx-auto my-px flex items-center justify-center text-xs rounded-full transition-colors',
-                        today ? 'bg-blue-600 text-white font-bold ring-2 ring-blue-300 dark:ring-blue-700' : busyClass(count)
+                        today ? 'bg-blue-600 text-white font-bold ring-2 ring-blue-300 dark:ring-blue-700' : busyClass(count),
+                        holiday && !today && 'font-bold !text-red-600 dark:!text-red-400'
                       )}
                     >
                       {format(day, 'd')}
@@ -144,6 +160,12 @@ export const YearView: React.FC<YearViewProps> = ({
           <span key={n} className={cn('w-3.5 h-3.5 rounded-full border border-gray-200 dark:border-gray-600', busyClass(n))} />
         ))}
         <span>Więcej wydarzeń</span>
+        {holidays.length > 0 && (
+          <>
+            <span className="ml-3 font-bold text-red-600 dark:text-red-400">12</span>
+            <span>dzień wolny</span>
+          </>
+        )}
       </div>
     </div>
   );
