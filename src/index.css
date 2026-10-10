@@ -144,6 +144,16 @@ body {
  * Androida dochodzą marginesy na pasek stanu i pasek nawigacji — bez nich
  * nagłówek chowa się pod zegarkiem systemowym.
  */
+/*
+ * Okna dialogowe zajmują cały ekran, więc same muszą ominąć paski systemowe.
+ * Wysokie okno (edycja wydarzenia na telefonie) przewija się w środku, zamiast
+ * chować przyciski pod paskiem nawigacji.
+ */
+.modal-frame {
+  padding-top: max(1rem, var(--sa-top));
+  padding-bottom: max(1rem, var(--sa-bottom));
+}
+
 .app-shell {
   height: 100dvh;
   box-sizing: border-box;

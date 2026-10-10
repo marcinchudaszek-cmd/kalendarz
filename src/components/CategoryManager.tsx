@@ -79,10 +79,10 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
     .filter((c) => c.count > 0);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center">
+    <div className="modal-frame fixed inset-0 z-[60] flex items-center justify-center">
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-in">
+      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-full overflow-y-auto animate-in">
         <div className="px-6 pt-5 pb-3">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Kategorie</h2>
         </div>

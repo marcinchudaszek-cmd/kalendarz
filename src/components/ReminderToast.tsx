@@ -31,7 +31,7 @@ export const ReminderToast: React.FC<ReminderToastProps> = ({
   return (
     <div
       data-print-hide
-      className="fixed bottom-4 right-4 z-[70] w-80 max-w-[calc(100vw-2rem)] space-y-2"
+      className="fixed bottom-[calc(1rem+var(--sa-bottom))] right-[calc(1rem+var(--sa-right))] z-[70] w-80 max-w-[calc(100vw-2rem)] space-y-2"
     >
       {reminders.map((event) => {
         const category = categories.find((c) => c.id === event.categoryId);

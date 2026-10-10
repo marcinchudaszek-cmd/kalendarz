@@ -430,7 +430,7 @@ function App() {
           onClick={() => setSidebarOpen(true)}
           aria-label="Pokaż panel boczny"
           className={cn(
-            'fixed bottom-4 left-4 z-40 lg:hidden w-12 h-12 bg-blue-500 text-white rounded-full shadow-lg items-center justify-center hover:bg-blue-600 transition-colors',
+            'fixed bottom-[calc(1rem+var(--sa-bottom))] left-[calc(1rem+var(--sa-left))] z-40 lg:hidden w-12 h-12 bg-blue-500 text-white rounded-full shadow-lg items-center justify-center hover:bg-blue-600 transition-colors',
             sidebarOpen ? 'hidden' : 'flex'
           )}
         >

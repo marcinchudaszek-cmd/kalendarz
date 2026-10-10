@@ -136,12 +136,12 @@ export const EventModal: React.FC<EventModalProps> = ({
   const selectedCat = categories.find((c) => c.id === categoryId);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="modal-frame fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-in">
+      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 max-h-full overflow-y-auto animate-in">
         {/* Colored top bar */}
         <div className={cn('h-2', selectedCat?.color || 'bg-blue-500')} />
 
