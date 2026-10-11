@@ -28,10 +28,12 @@ export const ReminderToast: React.FC<ReminderToastProps> = ({
 
   if (reminders.length === 0) return null;
 
+  // z-40: nad kalendarzem i panelem bocznym, ale pod oknami dialogowymi (z-50/z-60) —
+  // wcześniej dymek zasłaniał przycisk „Utwórz” w oknie wydarzenia.
   return (
     <div
       data-print-hide
-      className="fixed bottom-[calc(1rem+var(--sa-bottom))] right-[calc(1rem+var(--sa-right))] z-[70] w-80 max-w-[calc(100vw-2rem)] space-y-2"
+      className="fixed bottom-[calc(1rem+var(--sa-bottom))] right-[calc(1rem+var(--sa-right))] z-40 w-80 max-w-[calc(100vw-2rem)] space-y-2"
     >
       {reminders.map((event) => {
         const category = categories.find((c) => c.id === event.categoryId);

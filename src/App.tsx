@@ -493,7 +493,11 @@ function App() {
             categories={categories}
             visibleCategories={visibleCategories}
             toggleCategory={toggleCategory}
-            onCreateEvent={handleCreateButton}
+            onCreateEvent={() => {
+              // Na telefonie panel przykrywałby nowe wydarzenie po zapisaniu.
+              if (window.innerWidth < 1024) setSidebarOpen(false);
+              handleCreateButton();
+            }}
             onClose={() => setSidebarOpen(false)}
             onManageCategories={() => setCategoryManagerOpen(true)}
             reminderSettings={reminderSettings}

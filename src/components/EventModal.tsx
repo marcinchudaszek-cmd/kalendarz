@@ -410,8 +410,8 @@ export const EventModal: React.FC<EventModalProps> = ({
             />
           </div>
 
-          {/* Actions */}
-          <div className="flex justify-between">
+          {/* Actions — przyklejone do dołu okna, żeby były widoczne przy długim formularzu i otwartej klawiaturze. */}
+          <div className="sticky bottom-0 -mx-6 -mb-6 px-6 py-4 flex justify-between bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
             <div>
               {editing && onDelete && (
                 <button
