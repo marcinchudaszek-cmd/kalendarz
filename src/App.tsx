@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { ViewMode, CalendarEvent, Category, ReminderSettings } from './types';
-import { generateSampleEvents, generateId } from './data';
+import { generateId, cleanLoadedEvents, dedupeCategories } from './data';
 import {
   DEFAULT_CATEGORIES,
   hydrateCategories,
@@ -56,11 +56,11 @@ function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   // Siedem kolumn na telefonie zostawia na tytuł kilka znaków, więc tam zaczynamy od dnia.
   const [view, setView] = useState<ViewMode>(() => (window.innerWidth < 640 ? 'day' : 'week'));
-  // Po instalacji kalendarz jest pusty — wypełnianie go zmyślonymi wydarzeniami
-  // wyglądałoby jak cudze dane. Przykłady użytkownik wczytuje sam, gdy zechce.
-  const [events, setEvents] = useState<CalendarEvent[]>(() => loadEvents() ?? []);
+  // Po instalacji kalendarz jest pusty. Przykłady demonstracyjne z dawnych wersji
+  // (mylone z prawdziwymi planami) oraz zdublowane identyfikatory sprząta cleanLoadedEvents.
+  const [events, setEvents] = useState<CalendarEvent[]>(() => cleanLoadedEvents(loadEvents() ?? []));
   const [categories, setCategories] = useState<Category[]>(() =>
-    hydrateCategories(loadCategories() ?? DEFAULT_CATEGORIES)
+    hydrateCategories(dedupeCategories(loadCategories() ?? DEFAULT_CATEGORIES))
   );
   // Święta mają własną kategorię tylko do wyświetlania — włącza się je w ustawieniach świąt.
   const [visibleCategories, setVisibleCategories] = useState<Set<string>>(
@@ -407,10 +407,6 @@ function App() {
     [commitEvents]
   );
 
-  const handleLoadSamples = useCallback(() => {
-    commitEvents('Wczytanie przykładów', (prev) => (prev.length > 0 ? prev : generateSampleEvents()));
-    setCurrentDate(new Date());
-  }, [commitEvents]);
 
   const summaryRange = useMemo(() => getViewRange(currentDate, view), [currentDate, view]);
   const summaryLabel = useMemo(
@@ -526,7 +522,7 @@ function App() {
         {/* Main calendar view */}
         <main className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900 relative">
           {events.length === 0 && (
-            <EmptyState onCreate={handleCreateButton} onLoadSamples={handleLoadSamples} />
+            <EmptyState onCreate={handleCreateButton} />
           )}
           {view === 'year' && (
             <YearView
