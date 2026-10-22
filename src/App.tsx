@@ -38,6 +38,7 @@ import { cn } from './utils/cn';
 import { reminderFireTime } from './reminderUtils';
 import { scheduleReminderNotifications } from './utils/pwa';
 import { updateWidget, onWidgetAction } from './utils/widget';
+import { isNativePlatform } from './utils/nativeNotifications';
 
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -438,8 +439,10 @@ function App() {
     [view, handleCreateButton, undo]
   );
 
-  // Przy otwartym oknie edycji skróty tylko przeszkadzałyby.
-  useKeyboardShortcuts(shortcutHandlers, !modalOpen);
+  // Przy otwartym oknie edycji skróty tylko przeszkadzałyby. W aplikacji na telefonie wyłączone
+  // całkiem: klawiatura ekranowa potrafi dosłać litery po zamknięciu pola tekstowego, a „n”
+  // otwierało wtedy puste okno nowego wydarzenia.
+  useKeyboardShortcuts(shortcutHandlers, !modalOpen && !isNativePlatform());
 
   const popoverCategory = useMemo(
     () => (popoverEvent ? displayCategories.find((c) => c.id === popoverEvent.categoryId) : null),

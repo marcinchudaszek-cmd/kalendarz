@@ -21,6 +21,8 @@ import { eventActivationProps, EventActivate } from '../utils/eventActivation';
 
 const HOUR_HEIGHT = 60;
 const SNAP_MINUTES = 15;
+/** Stuknięcie w siatkę zaczyna wydarzenie od pełnej albo połówkowej godziny. */
+const TAP_SLOT_MINUTES = 30;
 /** Dopiero po takim ruchu myszy uznajemy, że to przeciąganie, a nie kliknięcie. */
 const DRAG_THRESHOLD_PX = 4;
 const ALL_DAY_BAR_HEIGHT = 22;
@@ -236,6 +238,13 @@ export const WeekView: React.FC<WeekViewProps> = ({
       const end = new Date(day);
       end.setHours(Math.floor(endMin / 60), endMin % 60, 0, 0);
       onCreateEvent(start, end);
+    } else {
+      // Stuknięcie bez przeciągania (na telefonie palcem nie da się przeciągnąć —
+      // to przewija siatkę): godzinne wydarzenie od klikniętego pół godziny.
+      const tapMin = Math.floor(((minY / HOUR_HEIGHT) * 60) / TAP_SLOT_MINUTES) * TAP_SLOT_MINUTES;
+      const start = new Date(day);
+      start.setHours(Math.floor(tapMin / 60), tapMin % 60, 0, 0);
+      onCreateEvent(start, addMinutes(start, 60));
     }
     setDragState(null);
   }, [onCreateEvent, onEventChange, yToTime, computeDraggedTimes]);
