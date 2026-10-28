@@ -121,9 +121,10 @@ export interface Category extends CategoryColor {
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
-export type SoundId = 'chime' | 'ping' | 'marimba' | 'gong' | 'beep';
+/** 'custom' = plik wybrany z telefonu (utils/customSound). */
+export type SoundId = 'chime' | 'ping' | 'marimba' | 'gong' | 'beep' | 'custom';
 
-export const SOUND_IDS: SoundId[] = ['chime', 'ping', 'marimba', 'gong', 'beep'];
+export const SOUND_IDS: SoundId[] = ['chime', 'ping', 'marimba', 'gong', 'beep', 'custom'];
 
 export interface ReminderSettings {
   soundEnabled: boolean;

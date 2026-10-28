@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ReminderSettings, SoundId, REMINDER_OPTIONS } from '../types';
 import {
   getNotificationPermission,
@@ -7,7 +7,8 @@ import {
 } from '../utils/notifications';
 import { playReminderSound, SOUND_OPTIONS } from '../utils/sound';
 import { scheduledNotificationsSupported } from '../utils/pwa';
-import { isNativePlatform } from '../utils/nativeNotifications';
+import { isNativePlatform, openNotificationSoundSettings } from '../utils/nativeNotifications';
+import { loadCustomSound, saveCustomSound } from '../utils/customSound';
 import { cn } from '../utils/cn';
 
 interface ReminderSettingsPanelProps {
@@ -37,7 +38,41 @@ export const ReminderSettingsPanel: React.FC<ReminderSettingsPanelProps> = ({ se
 
   const update = (patch: Partial<ReminderSettings>) => onChange({ ...settings, ...patch });
 
+  // Własny plik z telefonu: nazwa do pokazania i ukryte pole wyboru pliku.
+  const [customName, setCustomName] = useState<string | null>(null);
+  const [customError, setCustomError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    let aktualne = true;
+    void loadCustomSound().then((name) => {
+      if (aktualne) setCustomName(name);
+    });
+    return () => {
+      aktualne = false;
+    };
+  }, []);
+
+  const handleCustomFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      await saveCustomSound(file);
+      setCustomName(file.name);
+      setCustomError(null);
+      update({ sound: 'custom' });
+      playReminderSound('custom', settings.volume);
+    } catch (err) {
+      setCustomError(err instanceof Error ? err.message : 'Nie udało się zapisać pliku.');
+    }
+  };
+
   const handleSoundChange = (sound: SoundId) => {
+    // Pierwszy wybór własnego dźwięku — najpierw trzeba wskazać plik.
+    if (sound === 'custom' && !customName) {
+      fileRef.current?.click();
+      return;
+    }
     update({ sound });
     // Wybór z listy jest interakcją użytkownika, więc dźwięk zagra od razu.
     playReminderSound(sound, settings.volume);
@@ -94,7 +129,20 @@ export const ReminderSettingsPanel: React.FC<ReminderSettingsPanelProps> = ({ se
                 {option.label}
               </option>
             ))}
+            <option value="custom">{customName ? `Mój plik: ${customName}` : 'Własny plik z telefonu…'}</option>
           </select>
+
+          <input ref={fileRef} type="file" accept="audio/*" onChange={handleCustomFile} className="hidden" />
+          {settings.sound === 'custom' && (
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="mb-2 w-full px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Wybierz inny plik z telefonu
+            </button>
+          )}
+          {customError && <p className="mb-2 text-xs text-red-600 dark:text-red-400">{customError}</p>}
 
           <div className="flex items-center gap-2">
             <input
@@ -148,6 +196,21 @@ export const ReminderSettingsPanel: React.FC<ReminderSettingsPanelProps> = ({ se
                 Android może poprosić o zgodę na „Alarmy i przypomnienia" — bez niej
                 powiadomienia potrafią się spóźnić.
               </p>
+            )}
+            {settings.systemNotifications && isNativePlatform() && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => void openNotificationSoundSettings()}
+                  className="mt-2 w-full px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Dźwięk powiadomień w telefonie…
+                </button>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5 leading-relaxed">
+                  Gdy aplikacja jest zamknięta, powiadomienie gra dźwięk ustawiony w Androidzie —
+                  tam wybierzesz dowolny dzwonek albo muzykę z telefonu.
+                </p>
+              </>
             )}
             {settings.systemNotifications && !scheduledNotificationsSupported() && (
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5 leading-relaxed">

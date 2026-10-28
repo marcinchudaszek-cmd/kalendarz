@@ -1,4 +1,4 @@
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { ScheduledReminder } from './pwa';
 
@@ -96,5 +96,25 @@ export async function cancelAllNativeReminders(): Promise<void> {
     }
   } catch {
     // nic do posprzątania
+  }
+}
+
+interface KalendarzSystemPlugin {
+  otworzUstawieniaDzwieku(options: { kanal: string }): Promise<void>;
+}
+
+const KalendarzSystem = registerPlugin<KalendarzSystemPlugin>('KalendarzSystem');
+
+/**
+ * Otwiera systemowe ustawienia kanału przypomnień — tam użytkownik wybiera dźwięk
+ * powiadomień (dzwonki, muzyka z telefonu). Kanał tworzymy najpierw, żeby było co otworzyć.
+ */
+export async function openNotificationSoundSettings(): Promise<boolean> {
+  try {
+    await ensureChannel();
+    await KalendarzSystem.otworzUstawieniaDzwieku({ kanal: KANAL });
+    return true;
+  } catch {
+    return false;
   }
 }

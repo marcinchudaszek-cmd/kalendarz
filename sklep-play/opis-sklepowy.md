@@ -55,7 +55,8 @@ do motywu ikon w Androidzie 13 i nowszym.
 PRZYPOMNIENIA, KTÓRE SŁYCHAĆ
 Ustaw przypomnienie na 5, 10, 15, 30 minut, godzinę, dwie albo dzień przed wydarzeniem.
 Powiadomienie dotrze nawet wtedy, gdy aplikacja jest zamknięta.
-Do wyboru pięć dźwięków: Dzwonek, Ping, Marimba, Gong i Sygnał — z regulacją głośności.
+Do wyboru pięć dźwięków: Dzwonek, Ping, Marimba, Gong i Sygnał — albo własna muzyka
+lub dzwonek z telefonu. Z regulacją głośności.
 Nie masz teraz czasu? Odłóż przypomnienie o 5 minut jednym stuknięciem.
 
 WYDARZENIA CYKLICZNE

@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { CalendarEvent, Category, ThemeMode } from '../types';
+import { isNativePlatform } from '../utils/nativeNotifications';
 import { eventsToIcs, parseIcs } from '../icsUtils';
 import { format } from '../calendarUtils';
 import { cn } from '../utils/cn';
@@ -131,6 +132,8 @@ export const CalendarToolsPanel: React.FC<CalendarToolsPanelProps> = ({
 
       {status && <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{status}</p>}
 
+      {/* Na telefonie skróty są wyłączone (App.tsx), więc nie ma czego pokazywać. */}
+      {!isNativePlatform() && (
       <details className="mt-4">
         <summary className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer select-none">
           Skróty klawiszowe
@@ -148,6 +151,7 @@ export const CalendarToolsPanel: React.FC<CalendarToolsPanelProps> = ({
           ))}
         </dl>
       </details>
+      )}
     </div>
   );
 };

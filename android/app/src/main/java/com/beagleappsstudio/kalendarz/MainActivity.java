@@ -12,6 +12,7 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         // Własne wtyczki rejestrujemy przed startem mostu Capacitora.
         registerPlugin(WidzetPlugin.class);
+        registerPlugin(SystemPlugin.class);
         super.onCreate(savedInstanceState);
         obsluzWidzet(getIntent());
     }

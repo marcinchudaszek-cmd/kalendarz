@@ -1,4 +1,5 @@
 import { SoundId } from '../types';
+import { playCustomSound } from './customSound';
 
 let ctx: AudioContext | null = null;
 
@@ -47,7 +48,7 @@ export const SOUND_OPTIONS: { id: SoundId; label: string }[] = [
 ];
 
 /** Każdy dźwięk to kilka tonów składanych w locie — bez plików audio. */
-const SOUNDS: Record<SoundId, Tone[]> = {
+const SOUNDS: Record<Exclude<SoundId, 'custom'>, Tone[]> = {
   chime: [
     { freq: 880, at: 0, duration: 0.9 },
     { freq: 1174.7, at: 0.18, duration: 0.9 },
@@ -71,6 +72,12 @@ const SOUNDS: Record<SoundId, Tone[]> = {
 };
 
 export function playReminderSound(sound: SoundId, volume = 0.6): void {
+  // Własny plik z telefonu; gdy go zabrakło (np. wyczyszczone dane), gramy zwykły dzwonek.
+  if (sound === 'custom') {
+    if (playCustomSound(volume)) return;
+    sound = 'chime';
+  }
+
   const c = getContext();
   if (!c) return;
   if (c.state === 'suspended') void c.resume();

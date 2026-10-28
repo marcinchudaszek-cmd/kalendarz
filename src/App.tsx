@@ -15,7 +15,10 @@ import {
   saveCategories,
   loadHolidaySettings,
   saveHolidaySettings,
+  loadView,
+  saveView,
 } from './storage';
+import { loadCustomSound, stopCustomSound } from './utils/customSound';
 import { holidayEvents, HolidaySettings, HOLIDAY_CATEGORY, HOLIDAY_CATEGORY_ID } from './holidays';
 import { useReminders } from './hooks/useReminders';
 import { playReminderSound, unlockAudioOnFirstGesture } from './utils/sound';
@@ -56,7 +59,10 @@ import { CategoryManager } from './components/CategoryManager';
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   // Siedem kolumn na telefonie zostawia na tytuł kilka znaków, więc tam zaczynamy od dnia.
-  const [view, setView] = useState<ViewMode>(() => (window.innerWidth < 640 ? 'day' : 'week'));
+  // Na starcie wracamy do ostatnio używanego widoku.
+  const [view, setView] = useState<ViewMode>(
+    () => loadView() ?? (window.innerWidth < 640 ? 'day' : 'week')
+  );
   // Po instalacji kalendarz jest pusty. Przykłady demonstracyjne z dawnych wersji
   // (mylone z prawdziwymi planami) oraz zdublowane identyfikatory sprząta cleanLoadedEvents.
   const [events, setEvents] = useState<CalendarEvent[]>(() => cleanLoadedEvents(loadEvents() ?? []));
@@ -150,6 +156,11 @@ function App() {
   useEffect(() => saveSettings(reminderSettings), [reminderSettings]);
   useEffect(() => saveHolidaySettings(holidaySettings), [holidaySettings]);
   useEffect(() => unlockAudioOnFirstGesture(), []);
+  useEffect(() => saveView(view), [view]);
+  // Przygotowujemy własny dźwięk, żeby przypomnienie mogło zagrać od razu.
+  useEffect(() => {
+    void loadCustomSound();
+  }, []);
 
   // Dzwonek i powiadomienia czytają ustawienia w chwili zadziałania, nie z domknięcia sprzed godziny.
   const settingsRef = useRef(reminderSettings);
@@ -196,6 +207,8 @@ function App() {
   }, [expandedEvents, reminderSettings.systemNotifications]);
 
   const dismissReminder = useCallback((eventId: string) => {
+    // Własny utwór gra do 20 s — po „OK” albo „Odłóż” ma ucichnąć od razu.
+    stopCustomSound();
     setActiveReminders((prev) => prev.filter((e) => e.id !== eventId));
   }, []);
 

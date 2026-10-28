@@ -4,6 +4,7 @@ import {
   ReminderSettings,
   StoredCategory,
   ThemeMode,
+  ViewMode,
   DEFAULT_REMINDER_SETTINGS,
   SOUND_IDS,
 } from './types';
@@ -15,6 +16,8 @@ const FIRED_KEY = 'kalendarz.pokazanePrzypomnienia';
 const THEME_KEY = 'kalendarz.motyw';
 const CATEGORIES_KEY = 'kalendarz.kategorie';
 const HOLIDAYS_KEY = 'kalendarz.swieta';
+const VIEW_KEY = 'kalendarz.widok';
+const VIEWS: ViewMode[] = ['year', 'month', 'week', 'day', 'agenda'];
 
 interface StoredEvent extends Omit<CalendarEvent, 'start' | 'end' | 'recurrence'> {
   start: string;
@@ -116,6 +119,15 @@ export function loadHolidaySettings(): HolidaySettings {
 
 export function saveHolidaySettings(settings: HolidaySettings): void {
   write(HOLIDAYS_KEY, settings);
+}
+
+export function loadView(): ViewMode | null {
+  const stored = read<ViewMode>(VIEW_KEY);
+  return stored && VIEWS.includes(stored) ? stored : null;
+}
+
+export function saveView(view: ViewMode): void {
+  write(VIEW_KEY, view);
 }
 
 export function loadTheme(): ThemeMode {
