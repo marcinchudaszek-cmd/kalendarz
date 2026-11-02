@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:allowBackup="true"
@@ -165,4 +166,15 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Po restarcie telefonu trzeba ponownie zaplanować zmianę ikony o północy. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!--
+        Przypomnienia o dokładnej godzinie. Kalendarz jest aplikacją, której podstawową funkcją
+        są przypomnienia ustawiane przez użytkownika, więc korzysta z USE_EXACT_ALARM (Android 13+,
+        przyznawane automatycznie). Bez tego od Androida 14 system przesuwał przypomnienia nawet
+        o kilkanaście minut. SCHEDULE_EXACT_ALARM (z wtyczki) zostaje tylko dla Androida 12.
+    -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32"
+        tools:replace="android:maxSdkVersion" />
 </manifest>

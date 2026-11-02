@@ -26,15 +26,25 @@ const PERMISSION_TEXT: Record<PermissionState, string> = {
 export const ReminderSettingsPanel: React.FC<ReminderSettingsPanelProps> = ({ settings, onChange }) => {
   // Na Androidzie o stan zgody trzeba zapytać wtyczkę, więc odczyt jest asynchroniczny.
   const [permission, setPermission] = useState<PermissionState>('default');
+  // Sprawdzamy ponownie po zmianie ustawień (zgoda mogła przyjść z okna startowego aplikacji)
+  // i po powrocie do aplikacji (użytkownik mógł zmienić ją w ustawieniach systemu).
   useEffect(() => {
     let aktualne = true;
-    void getNotificationPermission().then((stan) => {
-      if (aktualne) setPermission(stan);
-    });
+    const odswiez = () => {
+      void getNotificationPermission().then((stan) => {
+        if (aktualne) setPermission(stan);
+      });
+    };
+    odswiez();
+    const naPowrot = () => {
+      if (document.visibilityState === 'visible') odswiez();
+    };
+    document.addEventListener('visibilitychange', naPowrot);
     return () => {
       aktualne = false;
+      document.removeEventListener('visibilitychange', naPowrot);
     };
-  }, []);
+  }, [settings.systemNotifications]);
 
   const update = (patch: Partial<ReminderSettings>) => onChange({ ...settings, ...patch });
 
@@ -193,8 +203,8 @@ export const ReminderSettingsPanel: React.FC<ReminderSettingsPanelProps> = ({ se
             </label>
             {settings.systemNotifications && isNativePlatform() && (
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5 leading-relaxed">
-                Android może poprosić o zgodę na „Alarmy i przypomnienia" — bez niej
-                powiadomienia potrafią się spóźnić.
+                Przypomnienia przychodzą o dokładnej godzinie, także przy zamkniętej aplikacji.
+                Gdy telefon jest wyciszony albo w trybie „Nie przeszkadzać”, Android ich nie zadzwoni.
               </p>
             )}
             {settings.systemNotifications && isNativePlatform() && (

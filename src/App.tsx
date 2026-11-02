@@ -17,7 +17,10 @@ import {
   saveHolidaySettings,
   loadView,
   saveView,
+  wasNotificationSetupDone,
+  markNotificationSetupDone,
 } from './storage';
+import { getNotificationPermission, requestNotificationPermission } from './utils/notifications';
 import { loadCustomSound, stopCustomSound } from './utils/customSound';
 import { holidayEvents, HolidaySettings, HOLIDAY_CATEGORY, HOLIDAY_CATEGORY_ID } from './holidays';
 import { useReminders } from './hooks/useReminders';
@@ -160,6 +163,24 @@ function App() {
   // Przygotowujemy własny dźwięk, żeby przypomnienie mogło zagrać od razu.
   useEffect(() => {
     void loadCustomSound();
+  }, []);
+
+  /**
+   * Na telefonie przypomnienie przy zamkniętej aplikacji to powiadomienie systemowe — bez niego
+   * nic nie zadzwoni. Wcześniej trzeba je było włączyć ręcznie w panelu i łatwo było to przeoczyć,
+   * więc przy pierwszym uruchomieniu prosimy o zgodę i włączamy je. Robimy to raz, żeby użytkownik
+   * mógł je potem świadomie wyłączyć.
+   */
+  useEffect(() => {
+    if (!isNativePlatform() || wasNotificationSetupDone()) return;
+    void (async () => {
+      let permission = await getNotificationPermission();
+      if (permission === 'default') permission = await requestNotificationPermission();
+      markNotificationSetupDone();
+      if (permission === 'granted') {
+        setReminderSettings((s) => (s.systemNotifications ? s : { ...s, systemNotifications: true }));
+      }
+    })();
   }, []);
 
   // Dzwonek i powiadomienia czytają ustawienia w chwili zadziałania, nie z domknięcia sprzed godziny.

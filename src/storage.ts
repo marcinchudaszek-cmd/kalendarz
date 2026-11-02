@@ -17,6 +17,7 @@ const THEME_KEY = 'kalendarz.motyw';
 const CATEGORIES_KEY = 'kalendarz.kategorie';
 const HOLIDAYS_KEY = 'kalendarz.swieta';
 const VIEW_KEY = 'kalendarz.widok';
+const NOTIF_SETUP_KEY = 'kalendarz.powiadomieniaUstawione';
 const VIEWS: ViewMode[] = ['year', 'month', 'week', 'day', 'agenda'];
 
 interface StoredEvent extends Omit<CalendarEvent, 'start' | 'end' | 'recurrence'> {
@@ -119,6 +120,15 @@ export function loadHolidaySettings(): HolidaySettings {
 
 export function saveHolidaySettings(settings: HolidaySettings): void {
   write(HOLIDAYS_KEY, settings);
+}
+
+/** Czy aplikacja na telefonie już raz poprosiła o zgodę na powiadomienia i je włączyła. */
+export function wasNotificationSetupDone(): boolean {
+  return read<boolean>(NOTIF_SETUP_KEY) === true;
+}
+
+export function markNotificationSetupDone(): void {
+  write(NOTIF_SETUP_KEY, true);
 }
 
 export function loadView(): ViewMode | null {

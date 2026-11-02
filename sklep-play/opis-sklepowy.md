@@ -114,20 +114,16 @@ i format 24-godzinny.
 
 ## Uprawnienia — wymagana dodatkowa deklaracja w Play Console
 
-Aplikacja używa uprawnienia **`SCHEDULE_EXACT_ALARM`**, żeby przypomnienie odezwało się
-o właściwej minucie, a nie „kiedyś w okolicach". Google traktuje je jako ograniczone
-i przy publikacji poprosi o wypełnienie deklaracji **„Alarmy i przypomnienia"**.
+Od wersji 1.4.1 aplikacja używa uprawnienia **`USE_EXACT_ALARM`** (Android 13+, przyznawane
+automatycznie), a `SCHEDULE_EXACT_ALARM` zostało tylko dla Androida 12. Bez dokładnych alarmów
+Android 14+ przesuwał przypomnienia nawet o kilkanaście minut.
+
+Przy wysyłce wersji z tym uprawnieniem Play Console poprosi o deklarację
+**„Uprawnienie do dokładnych alarmów”** — wybierz, że to **aplikacja kalendarza**
+(podstawowa funkcja: przypomnienia o wydarzeniach ustawiane przez użytkownika).
 
 Uzasadnienie do wpisania w formularzu:
 
-> Aplikacja jest kalendarzem, w którym użytkownik samodzielnie ustawia przypomnienia
-> o wydarzeniach. Powiadomienie musi pojawić się o dokładnej godzinie wskazanej przez
-> użytkownika (np. 15 minut przed spotkaniem), dlatego wymagane są dokładne alarmy.
-> Uprawnienie nie jest używane do żadnego innego celu.
-
-Ta kategoria (kalendarz z przypomnieniami ustawianymi przez użytkownika) jest wprost
-wymieniona przez Google jako dozwolone zastosowanie.
-
-Na samym urządzeniu Android może dodatkowo poprosić użytkownika o ręczne włączenie
-„Alarmy i przypomnienia" w ustawieniach aplikacji — bez tego powiadomienia nadal działają,
-ale system może je opóźnić. Aplikacja informuje o tym w panelu ustawień.
+> Kalendarz z przypomnieniami o wydarzeniach ustawianymi przez użytkownika. Przypomnienie
+> musi zadzwonić o dokładnej godzinie (np. 5 minut przed spotkaniem), także gdy aplikacja
+> jest zamknięta. Uprawnienie nie jest używane do żadnego innego celu.
