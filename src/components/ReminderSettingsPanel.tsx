@@ -7,7 +7,7 @@ import {
 } from '../utils/notifications';
 import { playReminderSound, SOUND_OPTIONS } from '../utils/sound';
 import { scheduledNotificationsSupported } from '../utils/pwa';
-import { isNativePlatform, openNotificationSoundSettings } from '../utils/nativeNotifications';
+import { isNativePlatform, openNotificationSoundSettings, scheduleTestReminder } from '../utils/nativeNotifications';
 import { loadCustomSound, saveCustomSound } from '../utils/customSound';
 import { cn } from '../utils/cn';
 
@@ -51,6 +51,7 @@ export const ReminderSettingsPanel: React.FC<ReminderSettingsPanelProps> = ({ se
   // Własny plik z telefonu: nazwa do pokazania i ukryte pole wyboru pliku.
   const [customName, setCustomName] = useState<string | null>(null);
   const [customError, setCustomError] = useState<string | null>(null);
+  const [testInfo, setTestInfo] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     let aktualne = true;
@@ -209,6 +210,21 @@ export const ReminderSettingsPanel: React.FC<ReminderSettingsPanelProps> = ({ se
             )}
             {settings.systemNotifications && isNativePlatform() && (
               <>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const ok = await scheduleTestReminder(10);
+                    setTestInfo(
+                      ok
+                        ? 'Za 10 sekund przyjdzie próbne przypomnienie — możesz zablokować telefon.'
+                        : 'Nie udało się zaplanować próbnego przypomnienia.'
+                    );
+                  }}
+                  className="mt-2 w-full px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/15 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/25 transition-colors"
+                >
+                  Wypróbuj przypomnienie
+                </button>
+                {testInfo && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5">{testInfo}</p>}
                 <button
                   type="button"
                   onClick={() => void openNotificationSoundSettings()}

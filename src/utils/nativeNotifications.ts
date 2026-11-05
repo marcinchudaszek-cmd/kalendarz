@@ -2,8 +2,17 @@ import { Capacitor, registerPlugin } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { ScheduledReminder } from './pwa';
 
-/** Osobny kanał pozwala użytkownikowi sterować dźwiękiem przypomnień w ustawieniach Androida. */
-const KANAL = 'przypomnienia';
+/**
+ * Osobny kanał pozwala użytkownikowi sterować dźwiękiem przypomnień w ustawieniach Androida.
+ *
+ * Kanał ma własny, wbudowany dźwięk (res/raw/przypomnienie.wav). Pierwszy kanał „przypomnienia”
+ * korzystał z domyślnego dźwięku powiadomień telefonu — gdy ktoś ma go ustawionego na „Brak”,
+ * przypomnienia przychodziły bez dźwięku. Dźwięku istniejącego kanału Android nie pozwala zmienić,
+ * stąd nowy identyfikator i usunięcie starego kanału.
+ */
+const KANAL = 'przypomnienia-dzwiek';
+const STARY_KANAL = 'przypomnienia';
+const DZWIEK = 'przypomnienie.wav';
 /** Android ogranicza liczbę zaplanowanych alarmów — bierzemy tylko najbliższe. */
 const MAX_ZAPLANOWANYCH = 64;
 
@@ -28,7 +37,10 @@ async function ensureChannel(): Promise<void> {
       description: 'Powiadomienia o zbliżających się wydarzeniach z kalendarza',
       importance: 5,
       visibility: 1,
+      sound: DZWIEK,
+      vibration: true,
     });
+    await LocalNotifications.deleteChannel({ id: STARY_KANAL }).catch(() => undefined);
   } catch {
     // Kanały istnieją tylko na Androidzie 8+; gdzie indziej to nie problem.
   }
@@ -77,6 +89,8 @@ export async function scheduleNativeReminders(items: ScheduledReminder[]): Promi
         title: item.title,
         body: item.body,
         channelId: KANAL,
+        // Dla Androida 7 (bez kanałów) dźwięk podaje się przy samym powiadomieniu.
+        sound: DZWIEK,
         smallIcon: 'ic_stat_kalendarz',
         schedule: { at: new Date(item.timestamp), allowWhileIdle: true },
       })),
@@ -113,6 +127,32 @@ export async function openNotificationSoundSettings(): Promise<boolean> {
   try {
     await ensureChannel();
     await KalendarzSystem.otworzUstawieniaDzwieku({ kanal: KANAL });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Próbne przypomnienie za kilka sekund — tym samym kanałem i dźwiękiem co prawdziwe.
+ * Pozwala sprawdzić, czy telefon zadzwoni, bez ustawiania wydarzenia „na wyścigi”.
+ */
+export async function scheduleTestReminder(seconds = 10): Promise<boolean> {
+  try {
+    await ensureChannel();
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: 1_999_999_999,
+          title: 'Próbne przypomnienie',
+          body: 'Tak zabrzmi przypomnienie o wydarzeniu',
+          channelId: KANAL,
+          sound: DZWIEK,
+          smallIcon: 'ic_stat_kalendarz',
+          schedule: { at: new Date(Date.now() + seconds * 1000), allowWhileIdle: true },
+        },
+      ],
+    });
     return true;
   } catch {
     return false;
