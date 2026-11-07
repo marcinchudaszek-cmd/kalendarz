@@ -1,6 +1,7 @@
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { ScheduledReminder } from './pwa';
+import { customSoundAsWavBase64, customSoundName } from './customSound';
 
 /**
  * Osobny kanał pozwala użytkownikowi sterować dźwiękiem przypomnień w ustawieniach Androida.
@@ -15,6 +16,27 @@ const STARY_KANAL = 'przypomnienia';
 const DZWIEK = 'przypomnienie.wav';
 /** Android ogranicza liczbę zaplanowanych alarmów — bierzemy tylko najbliższe. */
 const MAX_ZAPLANOWANYCH = 64;
+
+/**
+ * Kanał z dźwiękiem wybranym przez użytkownika (tworzy go wtyczka KalendarzSystem).
+ * Zapamiętujemy go, żeby nie przerabiać utworu przy każdym uruchomieniu.
+ */
+const WLASNY_KANAL_KEY = 'kalendarz.kanalWlasnegoDzwieku';
+let uzyjWlasnego = false;
+
+function zapisanyWlasnyKanal(): string | null {
+  try {
+    return localStorage.getItem(WLASNY_KANAL_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** Kanał, którym planujemy przypomnienia — zależy od wybranego dźwięku. */
+function aktywnyKanal(): string {
+  const wlasny = zapisanyWlasnyKanal();
+  return uzyjWlasnego && wlasny ? wlasny : KANAL;
+}
 
 export function isNativePlatform(): boolean {
   return Capacitor.isNativePlatform();
@@ -88,7 +110,7 @@ export async function scheduleNativeReminders(items: ScheduledReminder[]): Promi
         id: numericId(item.id),
         title: item.title,
         body: item.body,
-        channelId: KANAL,
+        channelId: aktywnyKanal(),
         // Dla Androida 7 (bez kanałów) dźwięk podaje się przy samym powiadomieniu.
         sound: DZWIEK,
         smallIcon: 'ic_stat_kalendarz',
@@ -115,9 +137,63 @@ export async function cancelAllNativeReminders(): Promise<void> {
 
 interface KalendarzSystemPlugin {
   otworzUstawieniaDzwieku(options: { kanal: string }): Promise<void>;
+  ustawWlasnyDzwiek(options: { dane: string; nazwa: string }): Promise<{ kanal: string }>;
+  usunWlasnyDzwiek(): Promise<void>;
 }
 
 const KalendarzSystem = registerPlugin<KalendarzSystemPlugin>('KalendarzSystem');
+
+/**
+ * Ustawia dźwięk powiadomień systemowych zgodnie z wyborem w aplikacji.
+ *
+ * Przy własnym pliku przerabiamy jego początek na WAV i zakładamy dla niego kanał — tylko tak
+ * zagra on przy zamkniętej aplikacji. `nowyPlik` wymusza przygotowanie kanału od nowa
+ * (użytkownik wskazał inny utwór). Zwraca false, gdy własnego dźwięku nie dało się ustawić
+ * i przypomnienia zagrają wbudowanym dźwiękiem.
+ */
+let kolejka: Promise<unknown> = Promise.resolve();
+
+/** Zdarzenie dla aplikacji: dźwięk powiadomień się zmienił, trzeba przeplanować przypomnienia. */
+export const NATIVE_SOUND_CHANGED = 'kalendarz-dzwiek-powiadomien';
+
+export function applyNativeReminderSound(wlasny: boolean, nowyPlik = false): Promise<boolean> {
+  // Po kolei — inaczej planowanie mogłoby wziąć kanał, który za chwilę zostanie usunięty.
+  const zadanie = kolejka.then(() => ustawDzwiek(wlasny, nowyPlik));
+  kolejka = zadanie.catch(() => undefined);
+  return zadanie;
+}
+
+async function ustawDzwiek(wlasny: boolean, nowyPlik: boolean): Promise<boolean> {
+  if (!isNativePlatform()) return true;
+  if (!wlasny) {
+    uzyjWlasnego = false;
+    if (zapisanyWlasnyKanal()) {
+      try {
+        localStorage.removeItem(WLASNY_KANAL_KEY);
+      } catch {
+        // bez znaczenia
+      }
+      await KalendarzSystem.usunWlasnyDzwiek().catch(() => undefined);
+    }
+    return true;
+  }
+  if (!nowyPlik && zapisanyWlasnyKanal()) {
+    uzyjWlasnego = true;
+    return true;
+  }
+  try {
+    const dane = await customSoundAsWavBase64();
+    if (!dane) throw new Error('Brak zapisanego pliku');
+    const { kanal } = await KalendarzSystem.ustawWlasnyDzwiek({ dane, nazwa: customSoundName() ?? 'własny plik' });
+    localStorage.setItem(WLASNY_KANAL_KEY, kanal);
+    uzyjWlasnego = true;
+    window.dispatchEvent(new Event(NATIVE_SOUND_CHANGED));
+    return true;
+  } catch {
+    uzyjWlasnego = false;
+    return false;
+  }
+}
 
 /**
  * Otwiera systemowe ustawienia kanału przypomnień — tam użytkownik wybiera dźwięk
@@ -126,7 +202,7 @@ const KalendarzSystem = registerPlugin<KalendarzSystemPlugin>('KalendarzSystem')
 export async function openNotificationSoundSettings(): Promise<boolean> {
   try {
     await ensureChannel();
-    await KalendarzSystem.otworzUstawieniaDzwieku({ kanal: KANAL });
+    await KalendarzSystem.otworzUstawieniaDzwieku({ kanal: aktywnyKanal() });
     return true;
   } catch {
     return false;
@@ -139,6 +215,7 @@ export async function openNotificationSoundSettings(): Promise<boolean> {
  */
 export async function scheduleTestReminder(seconds = 10): Promise<boolean> {
   try {
+    await kolejka; // poczekaj, aż kanał z własnym dźwiękiem będzie gotowy
     await ensureChannel();
     await LocalNotifications.schedule({
       notifications: [
@@ -146,7 +223,7 @@ export async function scheduleTestReminder(seconds = 10): Promise<boolean> {
           id: 1_999_999_999,
           title: 'Próbne przypomnienie',
           body: 'Tak zabrzmi przypomnienie o wydarzeniu',
-          channelId: KANAL,
+          channelId: aktywnyKanal(),
           sound: DZWIEK,
           smallIcon: 'ic_stat_kalendarz',
           schedule: { at: new Date(Date.now() + seconds * 1000), allowWhileIdle: true },

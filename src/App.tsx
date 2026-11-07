@@ -44,7 +44,7 @@ import { cn } from './utils/cn';
 import { reminderFireTime } from './reminderUtils';
 import { scheduleReminderNotifications } from './utils/pwa';
 import { updateWidget, onWidgetAction } from './utils/widget';
-import { isNativePlatform } from './utils/nativeNotifications';
+import { applyNativeReminderSound, isNativePlatform, NATIVE_SOUND_CHANGED } from './utils/nativeNotifications';
 
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -95,6 +95,13 @@ function App() {
 
   // Aktywne przypomnienia widoczne na ekranie
   const [activeReminders, setActiveReminders] = useState<CalendarEvent[]>([]);
+  // Zmienia się, gdy na telefonie powstał nowy kanał z własnym dźwiękiem — wtedy przeplanowujemy.
+  const [soundChannelVersion, setSoundChannelVersion] = useState(0);
+  useEffect(() => {
+    const onChange = () => setSoundChannelVersion((v) => v + 1);
+    window.addEventListener(NATIVE_SOUND_CHANGED, onChange);
+    return () => window.removeEventListener(NATIVE_SOUND_CHANGED, onChange);
+  }, []);
 
   /**
    * Serie rozwijamy na konkretne wystąpienia. Zakres pokrywa i to, co widać na ekranie,
@@ -224,8 +231,16 @@ function App() {
       .sort((a, b) => a.timestamp - b.timestamp)
       .slice(0, 50);
 
-    void scheduleReminderNotifications(items);
-  }, [expandedEvents, reminderSettings.systemNotifications]);
+    // Na telefonie dźwięk przypomnienia przy zamkniętej aplikacji zależy od kanału powiadomień.
+    const wlasny = reminderSettings.soundEnabled && reminderSettings.sound === 'custom';
+    void applyNativeReminderSound(wlasny).then(() => scheduleReminderNotifications(items));
+  }, [
+    expandedEvents,
+    reminderSettings.systemNotifications,
+    reminderSettings.sound,
+    reminderSettings.soundEnabled,
+    soundChannelVersion,
+  ]);
 
   const dismissReminder = useCallback((eventId: string) => {
     // Własny utwór gra do 20 s — po „OK” albo „Odłóż” ma ucichnąć od razu.

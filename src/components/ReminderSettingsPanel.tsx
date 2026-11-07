@@ -7,7 +7,12 @@ import {
 } from '../utils/notifications';
 import { playReminderSound, SOUND_OPTIONS } from '../utils/sound';
 import { scheduledNotificationsSupported } from '../utils/pwa';
-import { isNativePlatform, openNotificationSoundSettings, scheduleTestReminder } from '../utils/nativeNotifications';
+import {
+  applyNativeReminderSound,
+  isNativePlatform,
+  openNotificationSoundSettings,
+  scheduleTestReminder,
+} from '../utils/nativeNotifications';
 import { loadCustomSound, saveCustomSound } from '../utils/customSound';
 import { cn } from '../utils/cn';
 
@@ -73,6 +78,12 @@ export const ReminderSettingsPanel: React.FC<ReminderSettingsPanelProps> = ({ se
       setCustomError(null);
       update({ sound: 'custom' });
       playReminderSound('custom', settings.volume);
+      // Na telefonie ten sam utwór ma zagrać też w powiadomieniu przy zamkniętej aplikacji.
+      if (isNativePlatform() && !(await applyNativeReminderSound(true, true))) {
+        setCustomError(
+          'W aplikacji zagra Twój plik, ale powiadomienie systemowe użyje wbudowanego dźwięku — nie udało się odczytać tego formatu.'
+        );
+      }
     } catch (err) {
       setCustomError(err instanceof Error ? err.message : 'Nie udało się zapisać pliku.');
     }

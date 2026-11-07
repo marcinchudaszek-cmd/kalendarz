@@ -88,3 +88,75 @@ export function playCustomSound(volume: number): boolean {
   });
   return true;
 }
+
+/** Tyle sekund utworu trafia do dźwięku powiadomienia systemowego. */
+const NOTIFICATION_SECONDS = 20;
+const NOTIFICATION_RATE = 22050;
+
+/**
+ * Zamienia początek zapisanego utworu na krótki WAV (mono, 16 bit) w base64.
+ *
+ * Powiadomienie przy zamkniętej aplikacji odtwarza system, a nie aplikacja — trzeba mu dać
+ * gotowy plik. Przycinamy go do 20 s z wyciszeniem na końcu, żeby przypomnienie nie grało
+ * całej piosenki, i zapisujemy jako WAV, który Android odtworzy zawsze (MP3/M4A z telefonu
+ * bywają w formatach, których odtwarzacz powiadomień nie obsługuje).
+ */
+export async function customSoundAsWavBase64(): Promise<string | null> {
+  const stored = await withStore<StoredSound | undefined>('readonly', (s) => s.get(KEY)).catch(() => undefined);
+  if (!stored) return null;
+  const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+  const ctx = new Ctx();
+  try {
+    const decoded = await ctx.decodeAudioData(await stored.blob.arrayBuffer());
+    const seconds = Math.min(NOTIFICATION_SECONDS, decoded.duration);
+    const offline = new OfflineAudioContext(1, Math.ceil(seconds * NOTIFICATION_RATE), NOTIFICATION_RATE);
+    const src = offline.createBufferSource();
+    src.buffer = decoded;
+    const gain = offline.createGain();
+    // Krótkie wyciszenie na końcu zamiast ucięcia w pół dźwięku.
+    const fade = Math.min(1.5, seconds / 4);
+    gain.gain.setValueAtTime(1, Math.max(0, seconds - fade));
+    gain.gain.linearRampToValueAtTime(0, seconds);
+    src.connect(gain).connect(offline.destination);
+    src.start();
+    const rendered = await offline.startRendering();
+    return bytesToBase64(encodeWav(rendered.getChannelData(0), NOTIFICATION_RATE));
+  } finally {
+    void ctx.close();
+  }
+}
+
+function encodeWav(samples: Float32Array, rate: number): Uint8Array {
+  const buffer = new ArrayBuffer(44 + samples.length * 2);
+  const v = new DataView(buffer);
+  const text = (offset: number, s: string) => {
+    for (let i = 0; i < s.length; i++) v.setUint8(offset + i, s.charCodeAt(i));
+  };
+  text(0, 'RIFF');
+  v.setUint32(4, 36 + samples.length * 2, true);
+  text(8, 'WAVE');
+  text(12, 'fmt ');
+  v.setUint32(16, 16, true);
+  v.setUint16(20, 1, true); // PCM
+  v.setUint16(22, 1, true); // mono
+  v.setUint32(24, rate, true);
+  v.setUint32(28, rate * 2, true);
+  v.setUint16(32, 2, true);
+  v.setUint16(34, 16, true);
+  text(36, 'data');
+  v.setUint32(40, samples.length * 2, true);
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    v.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+  }
+  return new Uint8Array(buffer);
+}
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
