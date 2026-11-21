@@ -45,6 +45,21 @@ import { reminderFireTime } from './reminderUtils';
 import { scheduleReminderNotifications } from './utils/pwa';
 import { updateWidget, onWidgetAction } from './utils/widget';
 import { applyNativeReminderSound, isNativePlatform, NATIVE_SOUND_CHANGED } from './utils/nativeNotifications';
+import {
+  loadSportCache,
+  loadSportSettings,
+  saveSportCache,
+  saveSportSettings,
+  selectionKey,
+  sportCalendarEvents,
+  SportCache,
+  SportSettings,
+  SPORT_CATEGORY,
+  SPORT_CATEGORY_ID,
+  SPORT_REFRESH_MS,
+} from './sport/sportStore';
+import { fetchSportEvents } from './sport/fetchSport';
+import { SportSettingsPanel } from './components/SportSettingsPanel';
 
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -74,7 +89,7 @@ function App() {
   );
   // Święta mają własną kategorię tylko do wyświetlania — włącza się je w ustawieniach świąt.
   const [visibleCategories, setVisibleCategories] = useState<Set<string>>(
-    () => new Set([...categories.map((c) => c.id), HOLIDAY_CATEGORY_ID])
+    () => new Set([...categories.map((c) => c.id), HOLIDAY_CATEGORY_ID, SPORT_CATEGORY_ID])
   );
   const [holidaySettings, setHolidaySettings] = useState<HolidaySettings>(() => loadHolidaySettings());
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false);
@@ -128,9 +143,58 @@ function App() {
     return holidayEvents([y - 1, y, y + 1, now, now + 1], holidaySettings);
   }, [currentDate, holidaySettings]);
 
-  /** To, co rysują widoki: wydarzenia użytkownika i święta. */
-  const displayEvents = useMemo(() => [...holidays, ...expandedEvents], [holidays, expandedEvents]);
-  const displayCategories = useMemo(() => [...categories, HOLIDAY_CATEGORY], [categories]);
+  /**
+   * Terminarze sportowe z sieci. Pobieramy je tylko, gdy użytkownik wybrał jakąś dyscyplinę,
+   * najwyżej co 12 godzin; między pobraniami działają z zapisanej kopii (także offline).
+   */
+  const [sportSettings, setSportSettings] = useState<SportSettings>(() => loadSportSettings());
+  const [sportCache, setSportCache] = useState<SportCache | null>(() => loadSportCache());
+  const [sportLoading, setSportLoading] = useState(false);
+  const [sportError, setSportError] = useState<string | null>(null);
+  useEffect(() => saveSportSettings(sportSettings), [sportSettings]);
+
+  const refreshSport = useCallback(async (selected: SportSettings['selected']) => {
+    if (selected.length === 0) return;
+    setSportLoading(true);
+    setSportError(null);
+    try {
+      const { events: list, errors } = await fetchSportEvents(selected);
+      if (list.length === 0 && errors.length > 0) throw new Error(errors[0]);
+      const cache: SportCache = { key: selectionKey(selected), fetchedAt: Date.now(), events: list, errors };
+      setSportCache(cache);
+      saveSportCache(cache);
+      if (errors.length > 0) setSportError('Część terminarzy nie dała się pobrać — spróbuję ponownie później.');
+    } catch {
+      setSportError('Nie udało się pobrać terminarza. Sprawdź połączenie z internetem.');
+    } finally {
+      setSportLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const { selected } = sportSettings;
+    if (selected.length === 0) return;
+    const stale =
+      !sportCache || sportCache.key !== selectionKey(selected) || Date.now() - sportCache.fetchedAt > SPORT_REFRESH_MS;
+    if (stale) void refreshSport(selected);
+    // sportCache celowo poza zależnościami — liczy się tylko zmiana wyboru.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sportSettings.selected, refreshSport]);
+
+  const sportEvents = useMemo(
+    () => (sportCache && sportSettings.selected.length > 0 ? sportCalendarEvents(sportCache.events, sportSettings) : []),
+    [sportCache, sportSettings]
+  );
+
+  /** Własne wydarzenia i sport — z nich powstają przypomnienia. */
+  const reminderEvents = useMemo(() => [...expandedEvents, ...sportEvents], [expandedEvents, sportEvents]);
+
+  /** To, co rysują widoki: wydarzenia użytkownika, święta i sport. */
+  const displayEvents = useMemo(
+    () => [...holidays, ...expandedEvents, ...sportEvents],
+    [holidays, expandedEvents, sportEvents]
+  );
+  const displayCategories = useMemo(() => [...categories, HOLIDAY_CATEGORY, SPORT_CATEGORY], [categories]);
 
   const eventsRef = useRef(events);
   eventsRef.current = events;
@@ -205,7 +269,7 @@ function App() {
     }
   }, []);
 
-  const { snooze, clearFired } = useReminders(expandedEvents, handleReminderFire);
+  const { snooze, clearFired } = useReminders(reminderEvents, handleReminderFire);
 
   /**
    * Przekazujemy nadchodzące przypomnienia Service Workerowi. Tam, gdzie przeglądarka
@@ -216,7 +280,7 @@ function App() {
 
     const now = Date.now();
     const horizon = now + 30 * 24 * 60 * 60 * 1000;
-    const items = expandedEvents
+    const items = reminderEvents
       .map((event) => ({ event, fireAt: reminderFireTime(event) }))
       .filter((x): x is { event: CalendarEvent; fireAt: Date } => x.fireAt !== null)
       .map(({ event, fireAt }) => ({
@@ -235,7 +299,7 @@ function App() {
     const wlasny = reminderSettings.soundEnabled && reminderSettings.sound === 'custom';
     void applyNativeReminderSound(wlasny).then(() => scheduleReminderNotifications(items));
   }, [
-    expandedEvents,
+    reminderEvents,
     reminderSettings.systemNotifications,
     reminderSettings.sound,
     reminderSettings.soundEnabled,
@@ -295,8 +359,8 @@ function App() {
 
   // Widżet na ekranie głównym dostaje aktualne wydarzenia po każdej zmianie.
   useEffect(() => {
-    void updateWidget([...events, ...holidays], displayCategories);
-  }, [events, holidays, displayCategories]);
+    void updateWidget([...events, ...holidays, ...sportEvents], displayCategories);
+  }, [events, holidays, sportEvents, displayCategories]);
 
   // Kliknięcia w widżecie: „+” otwiera nowe wydarzenie, wiersz — jego dzień.
   useEffect(
@@ -363,7 +427,7 @@ function App() {
   const handleEventChange = useCallback(
     (event: CalendarEvent, start: Date, end: Date) => {
       // Święta są wyliczane — nie da się ich przesunąć.
-      if (event.holiday) return;
+      if (event.holiday || event.external) return;
       const masterId = event.seriesId ?? event.id;
       const deltaStart = start.getTime() - event.start.getTime();
       const deltaEnd = end.getTime() - event.end.getTime();
@@ -560,6 +624,17 @@ function App() {
             summaryLabel={summaryLabel}
             holidaySettings={holidaySettings}
             onHolidaySettingsChange={setHolidaySettings}
+            sportPanel={
+              <SportSettingsPanel
+                settings={sportSettings}
+                onChange={setSportSettings}
+                loading={sportLoading}
+                fetchedAt={sportCache?.key === selectionKey(sportSettings.selected) ? sportCache.fetchedAt : null}
+                count={sportEvents.length}
+                error={sportError}
+                onRefresh={() => void refreshSport(sportSettings.selected)}
+              />
+            }
           />
         </div>
 
@@ -573,13 +648,13 @@ function App() {
 
         {/* Main calendar view */}
         <main className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900 relative">
-          {events.length === 0 && (
+          {events.length === 0 && sportEvents.length === 0 && (
             <EmptyState onCreate={handleCreateButton} />
           )}
           {view === 'year' && (
             <YearView
               currentDate={currentDate}
-              events={expandedEvents}
+              events={reminderEvents}
               holidays={holidays}
               visibleCategories={visibleCategories}
               onOpenDay={(day) => {
@@ -660,8 +735,8 @@ function App() {
           category={popoverCategory}
           position={popoverPos}
           onClose={() => setPopoverEvent(null)}
-          onEdit={popoverEvent.holiday ? undefined : handleEditFromPopover}
-          onDelete={popoverEvent.holiday ? undefined : () => deleteOccurrence(popoverEvent)}
+          onEdit={popoverEvent.holiday || popoverEvent.external ? undefined : handleEditFromPopover}
+          onDelete={popoverEvent.holiday || popoverEvent.external ? undefined : () => deleteOccurrence(popoverEvent)}
           onDeleteSeries={popoverEvent.seriesId ? () => deleteSeries(popoverEvent) : undefined}
         />
       )}

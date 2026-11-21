@@ -1,7 +1,7 @@
 # Formularz „Bezpieczeństwo danych" w Play Console — gotowe odpowiedzi
 
 Google wymaga wypełnienia tej sekcji przed publikacją. Poniżej odpowiedzi zgodne
-ze stanem faktycznym aplikacji (wszystko zostaje na urządzeniu, brak sieci).
+ze stanem faktycznym aplikacji (dane użytkownika zostają na urządzeniu; od 1.5.0 opcjonalne pobieranie publicznych terminarzy sportowych).
 
 ## Zbieranie i udostępnianie danych
 
@@ -16,8 +16,11 @@ kategorie danych (lokalizacja, kontakty, pliki itd.).
 
 ## Uzasadnienie, gdyby recenzent dopytywał
 
-- Aplikacja nie wykonuje **żadnych** zapytań sieciowych. Cała warstwa webowa jest wbudowana
+- Domyślnie aplikacja nie wykonuje zapytań sieciowych. Cała warstwa webowa jest wbudowana
   w pakiet i ładowana z `https://localhost` przez Capacitora.
+- Od 1.5.0, tylko po zaznaczeniu dyscyplin w panelu „Sport”, aplikacja pobiera (GET) publiczne
+  terminarze z `en.wikipedia.org` i `api.jolpi.ca`. Nie wysyła żadnych danych użytkownika —
+  dlatego odpowiedź „Nie zbiera danych” pozostaje aktualna.
 - Wydarzenia, kategorie i ustawienia zapisywane są w `localStorage` WebView, czyli
   w prywatnym katalogu aplikacji.
 - Import i eksport `.ics` działa wyłącznie na plikach wskazanych przez użytkownika.

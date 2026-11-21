@@ -31,6 +31,8 @@ interface SidebarProps {
   summaryLabel: string;
   holidaySettings: HolidaySettings;
   onHolidaySettingsChange: (settings: HolidaySettings) => void;
+  /** Panel terminarzy sportowych (stan pobierania trzyma App). */
+  sportPanel?: React.ReactNode;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -54,6 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   summaryLabel,
   holidaySettings,
   onHolidaySettingsChange,
+  sportPanel,
 }) => {
   return (
     <aside className="w-60 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0 flex flex-col overflow-y-auto">
@@ -144,6 +147,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       />
 
       <HolidaySettingsPanel settings={holidaySettings} onChange={onHolidaySettingsChange} />
+
+      {sportPanel}
 
       <ReminderSettingsPanel settings={reminderSettings} onChange={onReminderSettingsChange} />
 

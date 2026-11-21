@@ -47,6 +47,8 @@ export interface CalendarEvent {
   occurrenceDate?: string;
   /** Święto wyliczane w locie — tylko do odczytu, nigdy nie trafia do zapisu. */
   holiday?: boolean;
+  /** Terminarz pobrany z sieci (sport) — tylko do odczytu, nigdy nie trafia do zapisu. */
+  external?: boolean;
 }
 
 export const RECURRENCE_OPTIONS: { value: RecurrenceFreq | null; label: string }[] = [

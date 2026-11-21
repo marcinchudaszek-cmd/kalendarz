@@ -31,7 +31,7 @@ Prosty kalendarz po polsku z przypomnieniami. Bez konta, dane zostają u Ciebie.
 ## Pełny opis (max 4000 znaków)
 
 ```
-Kalendarz, który po prostu przypomina o Twoich planach — bez zakładania konta, bez reklam i bez wysyłania czegokolwiek do internetu.
+Kalendarz, który po prostu przypomina o Twoich planach — bez zakładania konta, bez reklam i bez wysyłania Twoich danych do internetu.
 
 PIĘĆ WIDOKÓW
 • Rok — wszystkie miesiące na jednym ekranie z mapą zajętości dni
@@ -87,8 +87,15 @@ IMPORT I EKSPORT
 Przenieś swoje plany z innego kalendarza plikiem .ics albo zrób kopię zapasową
 swoich wydarzeń. Obsługiwane są także reguły powtarzania i przypomnienia.
 
+SPORT W KALENDARZU
+Włącz terminarze i dostawaj przypomnienia przed zawodami: mecze reprezentacji Polski
+w piłce nożnej, koszykówce i piłce ręcznej (mężczyzn i kobiet), Puchar Świata w skokach
+narciarskich i biatlonie, żużlowe Grand Prix oraz Formuła 1. Godziny w czasie polskim,
+terminarz odświeża się sam.
+
 DZIAŁA BEZ INTERNETU
-Aplikacja nie wymaga połączenia z siecią. Wszystkie dane zapisują się wyłącznie
+Aplikacja nie wymaga połączenia z siecią — łączy się tylko wtedy, gdy włączysz terminarze
+sportowe, i wyłącznie po to, żeby je pobrać. Twoje wydarzenia zapisują się wyłącznie
 na Twoim urządzeniu — nie ma serwera, konta ani logowania.
 
 PRYWATNOŚĆ

@@ -113,7 +113,7 @@ export const ReminderSettingsPanel: React.FC<ReminderSettingsPanelProps> = ({ se
       </h3>
 
       {/* Dźwięk */}
-      <label className="flex items-center gap-2.5 py-1.5 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+      <label className="relative flex items-center gap-2.5 py-1.5 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors">
         <input
           type="checkbox"
           checked={settings.soundEnabled}
