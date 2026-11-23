@@ -13,6 +13,8 @@ export type SportKey =
   | 'kosz_k'
   | 'reczna_m'
   | 'reczna_k'
+  | 'hokej_m'
+  | 'hokej_k'
   | 'skoki_m'
   | 'skoki_k'
   | 'biatlon_m'
@@ -298,10 +300,12 @@ const PREFIKS: Partial<Record<SportKey, string>> = {
   kosz_k: 'Koszykówka kobiet',
   reczna_m: 'Piłka ręczna',
   reczna_k: 'Piłka ręczna kobiet',
+  hokej_m: 'Hokej',
+  hokej_k: 'Hokej kobiet',
 };
 
 export function parseMatches(text: string, src: MatchSource, now: Date, team = 'POL'): SportEvent[] {
-  const boxes = findTemplates(text, /^\s*(football ?box|basketballbox|handballbox|volleyballbox)/i);
+  const boxes = findTemplates(text, /^\s*(football ?box|basketballbox|handballbox|volleyballbox|ice ?hockey ?box)/i);
   const out: SportEvent[] = [];
   for (const { body, index } of boxes) {
     const p = templateParams(body);

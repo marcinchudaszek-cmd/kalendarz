@@ -57,6 +57,8 @@ import {
   SPORT_CATEGORY,
   SPORT_CATEGORY_ID,
   SPORT_REFRESH_MS,
+  SPORT_RETRY_MS,
+  mergeSportEvents,
 } from './sport/sportStore';
 import { fetchSportEvents } from './sport/fetchSport';
 import { SportSettingsPanel } from './components/SportSettingsPanel';
@@ -158,7 +160,9 @@ function App() {
     setSportLoading(true);
     setSportError(null);
     try {
-      const { events: list, errors } = await fetchSportEvents(selected);
+      const { events: fresh, errors, failed } = await fetchSportEvents(selected);
+      const previous = loadSportCache();
+      const list = mergeSportEvents(fresh, previous?.events, failed);
       if (list.length === 0 && errors.length > 0) throw new Error(errors[0]);
       const cache: SportCache = { key: selectionKey(selected), fetchedAt: Date.now(), events: list, errors };
       setSportCache(cache);
@@ -174,8 +178,9 @@ function App() {
   useEffect(() => {
     const { selected } = sportSettings;
     if (selected.length === 0) return;
+    const maxAge = sportCache?.errors.length ? SPORT_RETRY_MS : SPORT_REFRESH_MS;
     const stale =
-      !sportCache || sportCache.key !== selectionKey(selected) || Date.now() - sportCache.fetchedAt > SPORT_REFRESH_MS;
+      !sportCache || sportCache.key !== selectionKey(selected) || Date.now() - sportCache.fetchedAt > maxAge;
     if (stale) void refreshSport(selected);
     // sportCache celowo poza zależnościami — liczy się tylko zmiana wyboru.
     // eslint-disable-next-line react-hooks/exhaustive-deps

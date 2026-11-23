@@ -19,10 +19,29 @@ export interface SportCache {
   errors: string[];
 }
 
+/** Po nieudanym pobraniu części źródeł próbujemy ponownie szybciej niż zwykle. */
+export const SPORT_RETRY_MS = 60 * 60 * 1000;
+
+/**
+ * Łączy świeży terminarz z poprzednim: wydarzenia dyscyplin, których źródło tym razem
+ * nie odpowiedziało, bierzemy z poprzedniej kopii, zamiast je gubić do następnego odświeżenia.
+ */
+export function mergeSportEvents(fresh: SportEvent[], previous: SportEvent[] | undefined, failed: SportKey[]): SportEvent[] {
+  if (!previous || failed.length === 0) return fresh;
+  const bad = new Set(failed);
+  const ids = new Set(fresh.map((e) => e.id));
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const kept = previous.filter(
+    (e) => e.sports.some((s) => bad.has(s)) && !ids.has(e.id) && e.start.slice(0, 10) >= yesterday
+  );
+  return [...fresh, ...kept].sort((a, b) => a.start.localeCompare(b.start));
+}
+
 export const SPORT_OPTIONS: { group: string; items: { key: SportKey; label: string }[] }[] = [
   { group: 'Piłka nożna – reprezentacja Polski', items: [{ key: 'pilka_m', label: 'Mężczyźni' }, { key: 'pilka_k', label: 'Kobiety' }] },
   { group: 'Koszykówka – reprezentacja Polski', items: [{ key: 'kosz_m', label: 'Mężczyźni' }, { key: 'kosz_k', label: 'Kobiety' }] },
   { group: 'Piłka ręczna – reprezentacja Polski', items: [{ key: 'reczna_m', label: 'Mężczyźni' }, { key: 'reczna_k', label: 'Kobiety' }] },
+  { group: 'Hokej na lodzie – reprezentacja Polski', items: [{ key: 'hokej_m', label: 'Mężczyźni' }, { key: 'hokej_k', label: 'Kobiety' }] },
   { group: 'Skoki narciarskie – Puchar Świata', items: [{ key: 'skoki_m', label: 'Mężczyźni' }, { key: 'skoki_k', label: 'Kobiety' }] },
   { group: 'Biatlon – Puchar Świata', items: [{ key: 'biatlon_m', label: 'Mężczyźni' }, { key: 'biatlon_k', label: 'Kobiety' }] },
   { group: 'Żużel', items: [{ key: 'zuzel', label: 'Grand Prix (mistrzostwa świata)' }] },

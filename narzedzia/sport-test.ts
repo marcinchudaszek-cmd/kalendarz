@@ -6,7 +6,7 @@ import { fetchSportEvents } from '../src/sport/fetchSport.ts';
 
 const now = new Date();
 const { events, errors } = await fetchSportEvents(
-  ['pilka_m', 'pilka_k', 'kosz_m', 'kosz_k', 'reczna_m', 'reczna_k', 'skoki_m', 'skoki_k', 'biatlon_m', 'biatlon_k', 'zuzel', 'f1'],
+  ['pilka_m', 'pilka_k', 'kosz_m', 'kosz_k', 'reczna_m', 'reczna_k', 'hokej_m', 'hokej_k', 'skoki_m', 'skoki_k', 'biatlon_m', 'biatlon_k', 'zuzel', 'f1'],
   now,
 );
 const bySport = new Map<string, typeof events>();

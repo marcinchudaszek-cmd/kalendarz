@@ -54,6 +54,19 @@ export function wikipediaPages(now: Date): PageSpec[] {
       { title: `${a} European Women's Handball Championship`, sports: ['reczna_k'], parse: match('reczna_k', `ME kobiet ${a} w piłce ręcznej`, 90) },
       { title: `${a} European Women's Handball Championship qualification`, sports: ['reczna_k'], parse: match('reczna_k', `Kwalifikacje ME kobiet ${a}`, 90) },
     );
+    // Hokej na lodzie — mistrzostwa świata we wszystkich dywizjach (Polska bywa w elicie i w Dywizji I).
+    for (const [div, nazwa] of [['', 'MŚ'], [' Division I', 'MŚ Dywizji I'], [' Division II', 'MŚ Dywizji II']] as const) {
+      pages.push(
+        { title: `${a} IIHF World Championship${div}`, sports: ['hokej_m'], parse: match('hokej_m', `${nazwa} ${a} w hokeju`, 150) },
+        { title: `${a} IIHF Women's World Championship${div}`, sports: ['hokej_k'], parse: match('hokej_k', `${nazwa} kobiet ${a} w hokeju`, 150) },
+      );
+    }
+    pages.push(
+      { title: `Ice hockey at the ${a} Winter Olympics – Men's qualification`, sports: ['hokej_m'], parse: match('hokej_m', `Kwalifikacje olimpijskie ${a} w hokeju`, 150) },
+      { title: `Ice hockey at the ${a} Winter Olympics – Men's tournament`, sports: ['hokej_m'], parse: match('hokej_m', `Igrzyska ${a} – hokej`, 150) },
+      { title: `Ice hockey at the ${a} Winter Olympics – Women's qualification`, sports: ['hokej_k'], parse: match('hokej_k', `Kwalifikacje olimpijskie kobiet ${a} w hokeju`, 150) },
+      { title: `Ice hockey at the ${a} Winter Olympics – Women's tournament`, sports: ['hokej_k'], parse: match('hokej_k', `Igrzyska ${a} – hokej kobiet`, 150) },
+    );
     // Żużel
     pages.push({ title: `${a} Speedway Grand Prix`, sports: ['zuzel'], parse: (t) => parseSpeedwayGP(t) });
   }

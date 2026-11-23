@@ -10,6 +10,8 @@ const PACZKA = 20;
 export interface SportFetchResult {
   events: SportEvent[];
   errors: string[];
+  /** Dyscypliny, których źródło nie odpowiedziało — dla nich warto zostawić poprzedni terminarz. */
+  failed: SportKey[];
 }
 
 async function wikiBatch(titles: string[]): Promise<Map<string, string>> {
@@ -57,16 +59,19 @@ export async function fetchSportEvents(selected: SportKey[], now = new Date()): 
   const wanted = new Set(selected);
   const errors: string[] = [];
   const events: SportEvent[] = [];
+  const failed = new Set<SportKey>();
 
   const pages = wikipediaPages(now).filter((p) => p.sports.some((s) => wanted.has(s)));
   const titles = [...new Set(pages.map((p) => p.title))];
   const texts = new Map<string, string>();
   for (let i = 0; i < titles.length; i += PACZKA) {
+    const part = titles.slice(i, i + PACZKA);
     try {
-      const batch = await wikiBatch(titles.slice(i, i + PACZKA));
+      const batch = await wikiBatch(part);
       batch.forEach((v, k) => texts.set(k, v));
     } catch (e) {
       errors.push(e instanceof Error ? e.message : String(e));
+      for (const p of pages) if (part.includes(p.title)) p.sports.forEach((s) => failed.add(s));
     }
   }
   for (const page of pages) {
@@ -87,6 +92,7 @@ export async function fetchSportEvents(selected: SportKey[], now = new Date()): 
         events.push(...parseF1(await res.json()));
       } catch (e) {
         errors.push(e instanceof Error ? e.message : String(e));
+        failed.add('f1');
       }
     }
   }
@@ -103,5 +109,5 @@ export async function fetchSportEvents(selected: SportKey[], now = new Date()): 
     if (!prev || (prev.allDay && !e.allDay)) unique.set(e.id, e);
   }
   const list = [...unique.values()].sort((a, b) => a.start.localeCompare(b.start));
-  return { events: list, errors };
+  return { events: list, errors, failed: [...failed].filter((s) => wanted.has(s)) };
 }

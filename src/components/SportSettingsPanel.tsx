@@ -120,6 +120,11 @@ export const SportSettingsPanel: React.FC<SportSettingsPanelProps> = ({
               Odśwież
             </button>
           </div>
+          {!loading && !error && fetchedAt && count === 0 && (
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+              Na razie brak ogłoszonych terminów. Pojawią się same, gdy organizatorzy opublikują terminarz.
+            </p>
+          )}
           {error && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</p>}
         </div>
       )}
