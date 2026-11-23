@@ -89,7 +89,7 @@ swoich wydarzeń. Obsługiwane są także reguły powtarzania i przypomnienia.
 
 SPORT W KALENDARZU
 Włącz terminarze i dostawaj przypomnienia przed zawodami: mecze reprezentacji Polski
-w piłce nożnej, koszykówce i piłce ręcznej (mężczyzn i kobiet), Puchar Świata w skokach
+w piłce nożnej, koszykówce, piłce ręcznej i hokeju (mężczyzn i kobiet), Puchar Świata w skokach
 narciarskich i biatlonie, żużlowe Grand Prix oraz Formuła 1. Godziny w czasie polskim,
 terminarz odświeża się sam.
 
