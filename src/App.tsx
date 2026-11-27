@@ -74,6 +74,7 @@ import { EventModal } from './components/EventModal';
 import { EventPopover } from './components/EventPopover';
 import { EmptyState } from './components/EmptyState';
 import { ReminderToast } from './components/ReminderToast';
+import { UpdatePrompt } from './components/UpdatePrompt';
 import { CategoryManager } from './components/CategoryManager';
 
 function App() {
@@ -757,6 +758,8 @@ function App() {
       />
 
       {/* Przypomnienia */}
+      <UpdatePrompt />
+
       <ReminderToast
         reminders={activeReminders}
         categories={categories}
